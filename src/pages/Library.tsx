@@ -16,7 +16,7 @@ const Library = () => {
   useEffect(() => {
     const load = async () => {
       let query = supabase.from("content_library").select("*, profiles!content_library_creator_id_fkey(name)").eq("is_active", true);
-      if (category !== "All") query = query.eq("category", category);
+      if (category !== "All") query = query.eq("category", category as any);
       const { data } = await query.order("created_at", { ascending: false });
       setItems(data || []);
     };
