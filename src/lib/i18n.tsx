@@ -13,7 +13,7 @@ const translations: Record<string, Record<Language, string>> = {
   "hero.badge": { en: "🇺🇿 #1 UGC Marketplace in Uzbekistan", ru: "🇺🇿 #1 UGC Маркетплейс в Узбекистане", uz: "🇺🇿 O'zbekistondagi #1 UGC Marketplace" },
   "hero.title1": { en: "Connect Brands with", ru: "Соединяем Бренды с", uz: "Brendlarni" },
   "hero.title2": { en: "UGC Creators", ru: "UGC Креаторами", uz: "UGC Kreatorlar" },
-  "hero.title3": { en: "", ru: "", uz: "bilan bog'laymiz" },
+  "hero.title3": { en: " ", ru: " ", uz: "bilan bog'laymiz" },
   "hero.subtitle": { en: "Find talented content creators or get hired by top brands. The easiest way to produce authentic user-generated content for TikTok, Instagram Reels, and more.", ru: "Найдите талантливых контент-мейкеров или получите заказ от топ-брендов. Самый простой способ создать UGC-контент для TikTok, Instagram Reels и других платформ.", uz: "Iste'dodli kontent yaratuvchilarni toping yoki top brendlardan buyurtma oling. TikTok, Instagram Reels va boshqa platformalar uchun UGC-kontent yaratishning eng oson yo'li." },
   "hero.cta.brand": { en: "I'm a Brand", ru: "Я Бренд", uz: "Men Brendman" },
   "hero.cta.creator": { en: "I'm a Creator", ru: "Я Креатор", uz: "Men Kreatorman" },
