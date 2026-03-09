@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, ReactNode } from "react";
+import React, { createContext, useContext, useState, ReactNode } from "react";
 
 export type Language = "en" | "ru" | "uz";
 
@@ -65,15 +65,49 @@ type I18nContextType = {
   t: (key: string) => string;
 };
 
+
+const SUPPORTED_LANGUAGES: Language[] = ["uz", "ru", "en"];
+const DEFAULT_LANGUAGE: Language = "ru";
+
 const I18nContext = createContext<I18nContextType>({
-  lang: "en",
+  lang: DEFAULT_LANGUAGE,
   setLang: () => {},
   t: (key: string) => key,
 });
 
+function getInitialLang(): Language {
+  if (typeof window !== "undefined") {
+    const stored = localStorage.getItem("ugcmarket_lang");
+    if (stored && SUPPORTED_LANGUAGES.includes(stored as Language)) {
+      return stored as Language;
+    }
+    // Optionally, detect browser language here
+  }
+  return DEFAULT_LANGUAGE;
+}
+
 export const I18nProvider = ({ children }: { children: ReactNode }) => {
-  const [lang, setLang] = useState<Language>("en");
+  const [lang, setLangState] = useState<Language>(getInitialLang());
   const t = (key: string) => translations[key]?.[lang] || key;
+
+  // Store language in localStorage and update <html lang>
+  const setLang = (newLang: Language) => {
+    if (SUPPORTED_LANGUAGES.includes(newLang)) {
+      setLangState(newLang);
+      if (typeof window !== "undefined") {
+        localStorage.setItem("ugcmarket_lang", newLang);
+        document.documentElement.lang = newLang;
+      }
+    }
+  };
+
+  // On mount, set <html lang>
+  React.useEffect(() => {
+    if (typeof window !== "undefined") {
+      document.documentElement.lang = lang;
+    }
+  }, [lang]);
+
   return (
     <I18nContext.Provider value={{ lang, setLang, t }}>
       {children}
