@@ -19,12 +19,16 @@ const Navbar = () => {
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 glass">
       <div className="container mx-auto flex items-center justify-between h-16 px-4">
-        <a href="/" className="flex items-center">
-          <img 
-            src="/assets/logo.webp" 
-            alt="UGC Market" 
-            className="h-9 w-auto"
-          />
+        <a href="/" className="flex items-center gap-2">
+          <img src="/assets/logo.webp" alt="UGC Market" className="h-9 w-auto" />
+          <span className="text-lg font-bold tracking-tight uppercase flex items-center">
+            <span className="bg-gradient-to-r from-pink-500 via-fuchsia-500 to-purple-600 bg-clip-text text-transparent">
+              UGC
+            </span>
+            <span className="text-black ml-1">
+              Marketplace
+            </span>
+          </span>
         </a>
 
         {/* Desktop */}
