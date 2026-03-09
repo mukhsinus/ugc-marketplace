@@ -1,3 +1,4 @@
+// src/lib/i18n.tsx
 import React, { createContext, useContext, useState, ReactNode } from "react";
 
 export type Language = "en" | "ru" | "uz";
