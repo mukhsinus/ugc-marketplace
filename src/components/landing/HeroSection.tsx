@@ -1,3 +1,4 @@
+// src/components/landing/HeroSection.tsx
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ArrowRight, Play } from "lucide-react";
@@ -56,7 +57,11 @@ const HeroSection = () => {
               </Button>
             </Link>
             <Link to="/signup?role=creator">
-              <Button size="lg" variant="outline" className="w-full sm:w-auto text-base px-8 gap-2 border-primary-foreground/20 text-primary-foreground hover:bg-primary-foreground/10">
+              <Button
+                size="lg"
+                variant="outline"
+                className="w-full sm:w-auto text-base px-8 gap-2 border-white/30 text-white bg-white/5 hover:bg-white/10"
+              >
                 <Play className="w-4 h-4" /> {t("hero.cta.creator")}
               </Button>
             </Link>
