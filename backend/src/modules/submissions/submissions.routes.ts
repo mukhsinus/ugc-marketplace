@@ -1,30 +1,30 @@
-// backend/src/modules/proposals/proposals.routes.ts
+// backend/src/modules/submissions/submissions.routes.ts
 import { FastifyInstance } from "fastify";
 import { authMiddleware } from "../../middleware/auth.middleware";
 import {
-  createProposal,
-  updateProposal,
-  getJobProposals
-} from "./proposals.controller";
+  getJobSubmissions,
+  createSubmission,
+  updateSubmission
+} from "./submissions.controller";
 
-export async function proposalsRoutes(app: FastifyInstance) {
+export async function submissionsRoutes(app: FastifyInstance) {
 
   app.get(
     "/job/:jobId",
     { preHandler: authMiddleware },
-    getJobProposals
+    getJobSubmissions
   );
 
   app.post(
-    "/job/:jobId",
+    "/",
     { preHandler: authMiddleware },
-    createProposal
+    createSubmission
   );
 
   app.patch(
     "/:id",
     { preHandler: authMiddleware },
-    updateProposal
+    updateSubmission
   );
 
 }
