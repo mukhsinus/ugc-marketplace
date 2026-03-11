@@ -1,3 +1,4 @@
+// src/components/ProtectedRoute.tsx
 import { useAuth } from "@/lib/auth";
 import { Navigate } from "react-router-dom";
 
