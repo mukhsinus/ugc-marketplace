@@ -20,6 +20,7 @@ const Navbar = () => {
   const location = useLocation();
 
   const isHome = location.pathname === "/";
+  const transparentHero = isHome && !scrolled;
 
   useEffect(() => {
     const handleScroll = () => {
@@ -31,8 +32,6 @@ const Navbar = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const transparentHero = isHome && !scrolled;
-
   return (
     <nav
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
@@ -42,6 +41,7 @@ const Navbar = () => {
       <div className="container mx-auto flex items-center justify-between h-16 px-4">
         <Link to="/" className="flex items-center gap-2">
           <img src="/assets/logo.webp" alt="UGC Market" className="h-9 w-auto" />
+
           <span className="text-lg font-bold tracking-tight uppercase flex items-center">
             <span className="bg-gradient-to-r from-pink-500 via-fuchsia-500 to-purple-600 bg-clip-text text-transparent">
               UGC
@@ -139,21 +139,28 @@ const Navbar = () => {
           }`}
           onClick={() => setOpen(!open)}
         >
-          {open ? (
-            <X className="w-6 h-6" />
-          ) : (
-            <Menu className="w-6 h-6" />
-          )}
+          {open ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
         </button>
       </div>
 
       {/* Mobile menu */}
       {open && (
-        <div className="md:hidden glass border-t border-border px-4 pb-4 space-y-3">
+        <div
+          className={`md:hidden border-t px-4 pb-4 pt-6 space-y-4 transition-all
+          ${
+            transparentHero
+              ? "border-white/10 backdrop-blur-xl bg-black/40"
+              : "glass border-border"
+          }`}
+        >
           <Link
             to="/creators"
             onClick={() => setOpen(false)}
-            className="block py-2 text-sm font-medium text-muted-foreground"
+            className={`block py-2 text-sm font-medium ${
+              transparentHero
+                ? "text-white/80 hover:text-white"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
           >
             {t("nav.creators")}
           </Link>
@@ -161,7 +168,11 @@ const Navbar = () => {
           <Link
             to="/jobs"
             onClick={() => setOpen(false)}
-            className="block py-2 text-sm font-medium text-muted-foreground"
+            className={`block py-2 text-sm font-medium ${
+              transparentHero
+                ? "text-white/80 hover:text-white"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
           >
             {t("nav.jobs")}
           </Link>
@@ -169,12 +180,16 @@ const Navbar = () => {
           <Link
             to="/library"
             onClick={() => setOpen(false)}
-            className="block py-2 text-sm font-medium text-muted-foreground"
+            className={`block py-2 text-sm font-medium ${
+              transparentHero
+                ? "text-white/80 hover:text-white"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
           >
             {t("nav.library")}
           </Link>
 
-          <div className="flex gap-2 pt-2">
+          <div className="flex gap-2 pt-3">
             {(["en", "ru", "uz"] as Language[]).map((l) => (
               <Button
                 key={l}
@@ -187,7 +202,7 @@ const Navbar = () => {
             ))}
           </div>
 
-          <div className="flex gap-2 pt-2">
+          <div className="flex gap-2 pt-3">
             <Link to="/login" className="flex-1">
               <Button variant="outline" className="w-full" size="sm">
                 {t("nav.login")}
