@@ -2,27 +2,29 @@
 import Fastify from "fastify";
 import cors from "@fastify/cors";
 import dotenv from "dotenv";
-import pino from "pino";
 
 import { registerRoutes } from "./routes";
 
 dotenv.config();
 
-const logger = pino({
-  transport: {
-    target: "pino-pretty",
-  },
-});
-
 const fastify = Fastify({
-  logger,
+  logger: {
+    level: "info",
+    transport: {
+      target: "pino-pretty",
+      options: {
+        translateTime: "HH:MM:ss Z",
+        ignore: "pid,hostname"
+      }
+    }
+  }
 });
 
 async function start() {
   try {
     await fastify.register(cors, {
       origin: true,
-      credentials: true,
+      credentials: true
     });
 
     await registerRoutes(fastify);
@@ -35,10 +37,10 @@ async function start() {
 
     await fastify.listen({
       port: PORT,
-      host: "0.0.0.0",
+      host: "0.0.0.0"
     });
 
-    console.log(`Server running on port ${PORT}`);
+    fastify.log.info(`Server running on http://localhost:${PORT}`);
   } catch (err) {
     fastify.log.error(err);
     process.exit(1);
