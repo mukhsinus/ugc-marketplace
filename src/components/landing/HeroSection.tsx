@@ -9,12 +9,12 @@ const HeroSection = () => {
   const { t } = useI18n();
 
   return (
-    <section className="hero-bg relative overflow-hidden min-h-[90vh] flex items-center">
+    <section className="hero-bg relative w-full min-h-screen overflow-hidden flex items-center">
       {/* Gradient orbs */}
       <div className="absolute top-20 left-10 w-72 h-72 bg-primary/10 rounded-full blur-3xl" />
       <div className="absolute bottom-20 right-10 w-96 h-96 bg-accent/10 rounded-full blur-3xl" />
 
-      <div className="container mx-auto px-4 pt-24 pb-16 relative z-10">
+      <div className="relative max-w-7xl mx-auto w-full px-6 md:px-10 lg:px-12 flex flex-col items-center justify-center min-h-screen">
         <div className="max-w-4xl mx-auto text-center">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
