@@ -7,6 +7,7 @@ import { registerRoutes } from "./routes";
 import { registerErrorHandler } from "./middleware/error.middleware";
 import { requestLoggerMiddleware } from "./middleware/requestLogger.middleware";
 import { registerSecurityMiddleware } from "./middleware/security.middleware";
+import { registerWebsocket } from "./plugins/websocket";
 import { supabaseAdmin } from "./config/supabase";
 
 dotenv.config();
@@ -27,25 +28,21 @@ const fastify = Fastify({
 async function start() {
   try {
 
-    // CORS
     await fastify.register(cors, {
       origin: true,
       credentials: true
     });
 
-    // Request tracing
     fastify.addHook("onRequest", requestLoggerMiddleware);
 
-    // Security headers
     await registerSecurityMiddleware(fastify);
 
-    // Routes
+    await registerWebsocket(fastify);
+
     await registerRoutes(fastify);
 
-    // Global error handler
     registerErrorHandler(fastify);
 
-    // Health endpoint
     fastify.get("/health", async () => {
       return {
         status: "ok",
@@ -54,7 +51,6 @@ async function start() {
       };
     });
 
-    // Database health check
     fastify.get("/health/db", async () => {
 
       const { error } = await supabaseAdmin

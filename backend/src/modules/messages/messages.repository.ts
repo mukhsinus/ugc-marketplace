@@ -4,9 +4,18 @@ import { supabaseAdmin } from "../../config/supabase";
 class MessagesRepository {
 
   async getJob(jobId: string) {
+
     const { data } = await supabaseAdmin
       .from("jobs")
-      .select("*")
+      .select(`
+        *,
+        profiles!jobs_brand_id_fkey(
+          id,
+          name,
+          company_name,
+          avatar_url
+        )
+      `)
       .eq("id", jobId)
       .single();
 
@@ -14,6 +23,7 @@ class MessagesRepository {
   }
 
   async getProfile(userId: string) {
+
     const { data } = await supabaseAdmin
       .from("profiles")
       .select("*")
@@ -24,6 +34,7 @@ class MessagesRepository {
   }
 
   async getAcceptedCreator(jobId: string) {
+
     const { data } = await supabaseAdmin
       .from("proposals")
       .select("creator_id")
@@ -35,24 +46,69 @@ class MessagesRepository {
   }
 
   async getMessages(jobId: string) {
+
     const { data } = await supabaseAdmin
       .from("messages")
-      .select("*, profiles!messages_sender_id_fkey(name, avatar_url, role)")
+      .select(`
+        *,
+        profiles!messages_sender_id_fkey(
+          id,
+          name,
+          avatar_url,
+          role
+        )
+      `)
       .eq("job_id", jobId)
+      .is("deleted_at", null)
       .order("created_at", { ascending: true });
 
     return data;
   }
 
+  async getMessage(messageId: string) {
+
+    const { data } = await supabaseAdmin
+      .from("messages")
+      .select("*")
+      .eq("id", messageId)
+      .single();
+
+    return data;
+  }
+
   async createMessage(payload: any) {
+
     const { data } = await supabaseAdmin
       .from("messages")
       .insert(payload)
+      .select(`
+        *,
+        profiles!messages_sender_id_fkey(
+          id,
+          name,
+          avatar_url,
+          role
+        )
+      `)
+      .single();
+
+    return data;
+  }
+
+  async markAsSeen(messageId: string) {
+
+    const { data } = await supabaseAdmin
+      .from("messages")
+      .update({
+        seen_at: new Date()
+      })
+      .eq("id", messageId)
       .select()
       .single();
 
     return data;
   }
+
 }
 
 export const messagesRepository = new MessagesRepository();

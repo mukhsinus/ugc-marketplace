@@ -27,3 +27,16 @@ export async function sendMessage(
 
   return reply.status(201).send(message);
 }
+
+export async function markMessageSeen(
+  request: FastifyRequest<{ Params: { id: string } }>,
+  reply: FastifyReply
+) {
+
+  const message = await messagesService.markMessageSeen(
+    request.user!.id,
+    request.params.id
+  );
+
+  return reply.send(message);
+}

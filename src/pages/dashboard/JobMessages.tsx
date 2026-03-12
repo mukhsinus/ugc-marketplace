@@ -1,6 +1,6 @@
 // src/pages/dashboard/JobMessages.tsx
 import { useParams } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 
 import DashboardLayout from "@/components/DashboardLayout";
 
@@ -22,6 +22,7 @@ import { toast } from "sonner";
 
 import { useJobMessages } from "@/hooks/useJobMessages";
 import { messagesService } from "@/services/messages.service";
+import { useChatSocket } from "@/hooks/useChatSocket";
 
 const JobMessages = () => {
 
@@ -29,11 +30,57 @@ const JobMessages = () => {
 
   const [newMessage, setNewMessage] = useState("");
   const [sending, setSending] = useState(false);
+  const [messagesState, setMessagesState] = useState<any[]>([]);
+  const [typingUser, setTypingUser] = useState<string | null>(null);
+
+  const typingTimer = useRef<any>(null);
 
   const { data, isLoading, refetch } = useJobMessages(jobId);
 
-  const messages = data?.messages || [];
   const job = data?.job;
+
+  useEffect(() => {
+    if (data?.messages) {
+      setMessagesState(data.messages);
+    }
+  }, [data]);
+
+  const {
+    sendTypingStart,
+    sendTypingStop
+  } = useChatSocket(jobId, {
+
+    onMessage: (message) => {
+
+      setMessagesState((prev) => [...prev, message]);
+
+    },
+
+    onSeen: ({ messageId }) => {
+
+      setMessagesState((prev) =>
+        prev.map((m) =>
+          m.id === messageId
+            ? { ...m, seen_at: new Date().toISOString() }
+            : m
+        )
+      );
+
+    },
+
+    onTypingStart: (payload) => {
+
+      setTypingUser(payload?.name || "User");
+
+    },
+
+    onTypingStop: () => {
+
+      setTypingUser(null);
+
+    }
+
+  });
 
   const sendMessage = async () => {
 
@@ -43,9 +90,14 @@ const JobMessages = () => {
 
       setSending(true);
 
-      await messagesService.sendMessage(jobId, newMessage.trim());
+      await messagesService.sendMessage(
+        jobId,
+        newMessage.trim()
+      );
 
       setNewMessage("");
+
+      sendTypingStop();
 
       await refetch();
 
@@ -58,6 +110,22 @@ const JobMessages = () => {
       setSending(false);
 
     }
+
+  };
+
+  const handleTyping = (value: string) => {
+
+    setNewMessage(value);
+
+    sendTypingStart({ name: "User" });
+
+    if (typingTimer.current) {
+      clearTimeout(typingTimer.current);
+    }
+
+    typingTimer.current = setTimeout(() => {
+      sendTypingStop();
+    }, 2000);
 
   };
 
@@ -95,7 +163,7 @@ const JobMessages = () => {
                 </p>
               )}
 
-              {messages.map((msg: any) => {
+              {messagesState.map((msg: any) => {
 
                 const isMe = msg.isMine;
 
@@ -131,6 +199,12 @@ const JobMessages = () => {
                           .toLocaleTimeString()}
                       </p>
 
+                      {msg.seen_at && isMe && (
+                        <p className="text-[10px] opacity-50 mt-1">
+                          ✓✓ seen
+                        </p>
+                      )}
+
                     </div>
 
                   </div>
@@ -139,7 +213,13 @@ const JobMessages = () => {
 
               })}
 
-              {!isLoading && messages.length === 0 && (
+              {typingUser && (
+                <p className="text-sm text-muted-foreground px-2">
+                  {typingUser} is typing...
+                </p>
+              )}
+
+              {!isLoading && messagesState.length === 0 && (
                 <p className="text-center text-muted-foreground py-8">
                   No messages yet. Start the conversation!
                 </p>
@@ -155,7 +235,7 @@ const JobMessages = () => {
               placeholder="Type a message..."
               value={newMessage}
               onChange={(e) =>
-                setNewMessage(e.target.value)
+                handleTyping(e.target.value)
               }
               onKeyDown={(e) => {
 
