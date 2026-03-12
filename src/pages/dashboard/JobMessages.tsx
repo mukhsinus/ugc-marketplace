@@ -16,12 +16,13 @@ import {
 
 import { ScrollArea } from "@/components/ui/scroll-area";
 
-import { Send } from "lucide-react";
+import { Send, Paperclip } from "lucide-react";
 
 import { toast } from "sonner";
 
 import { useJobMessages } from "@/hooks/useJobMessages";
-import { messagesService } from "@/services/messages.service";
+import { messagesService, Attachment } from "@/services/messages.service";
+import { uploadService } from "@/services/upload.service";
 import { useChatSocket } from "@/hooks/useChatSocket";
 
 const JobMessages = () => {
@@ -32,7 +33,10 @@ const JobMessages = () => {
   const [sending, setSending] = useState(false);
   const [messagesState, setMessagesState] = useState<any[]>([]);
   const [typingUser, setTypingUser] = useState<string | null>(null);
+  const [attachments, setAttachments] = useState<Attachment[]>([]);
+  const [uploading, setUploading] = useState(false);
 
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
   const typingTimer = useRef<any>(null);
 
   const { data, isLoading, refetch } = useJobMessages(jobId);
@@ -51,13 +55,10 @@ const JobMessages = () => {
   } = useChatSocket(jobId, {
 
     onMessage: (message) => {
-
       setMessagesState((prev) => [...prev, message]);
-
     },
 
     onSeen: ({ messageId }) => {
-
       setMessagesState((prev) =>
         prev.map((m) =>
           m.id === messageId
@@ -65,26 +66,21 @@ const JobMessages = () => {
             : m
         )
       );
-
     },
 
     onTypingStart: (payload) => {
-
       setTypingUser(payload?.name || "User");
-
     },
 
     onTypingStop: () => {
-
       setTypingUser(null);
-
     }
 
   });
 
   const sendMessage = async () => {
 
-    if (!jobId || !newMessage.trim()) return;
+    if (!jobId || (!newMessage.trim() && attachments.length === 0)) return;
 
     try {
 
@@ -92,10 +88,12 @@ const JobMessages = () => {
 
       await messagesService.sendMessage(
         jobId,
-        newMessage.trim()
+        newMessage.trim() || undefined,
+        attachments
       );
 
       setNewMessage("");
+      setAttachments([]);
 
       sendTypingStop();
 
@@ -126,6 +124,32 @@ const JobMessages = () => {
     typingTimer.current = setTimeout(() => {
       sendTypingStop();
     }, 2000);
+
+  };
+
+  const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+
+    const file = e.target.files?.[0];
+
+    if (!file) return;
+
+    try {
+
+      setUploading(true);
+
+      const uploaded = await uploadService.uploadFile(file);
+
+      setAttachments((prev) => [...prev, uploaded]);
+
+    } catch {
+
+      toast.error("File upload failed");
+
+    } finally {
+
+      setUploading(false);
+
+    }
 
   };
 
@@ -190,9 +214,46 @@ const JobMessages = () => {
                         {msg.sender?.name || "User"}
                       </p>
 
-                      <p className="text-sm">
-                        {msg.text}
-                      </p>
+                      {msg.text && (
+                        <p className="text-sm">
+                          {msg.text}
+                        </p>
+                      )}
+
+                      {msg.attachments?.map((a: any, i: number) => (
+
+                        <div key={i} className="mt-2">
+
+                          {a.type === "image" && (
+                            <img
+                              src={a.url}
+                              alt={a.name}
+                              className="rounded-lg max-h-48"
+                            />
+                          )}
+
+                          {a.type === "video" && (
+                            <video
+                              src={a.url}
+                              controls
+                              className="rounded-lg max-h-48"
+                            />
+                          )}
+
+                          {a.type === "file" && (
+                            <a
+                              href={a.url}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="underline text-sm"
+                            >
+                              {a.name}
+                            </a>
+                          )}
+
+                        </div>
+
+                      ))}
 
                       <p className="text-xs opacity-50 mt-1">
                         {new Date(msg.created_at)
@@ -229,7 +290,30 @@ const JobMessages = () => {
 
           </ScrollArea>
 
+          {attachments.length > 0 && (
+            <div className="px-4 pb-2 text-xs text-muted-foreground">
+              {attachments.map((a, i) => (
+                <div key={i}>{a.name}</div>
+              ))}
+            </div>
+          )}
+
           <div className="border-t border-border p-4 flex gap-2">
+
+            <input
+              type="file"
+              hidden
+              ref={fileInputRef}
+              onChange={handleFileSelect}
+            />
+
+            <Button
+              variant="outline"
+              onClick={() => fileInputRef.current?.click()}
+              disabled={uploading}
+            >
+              <Paperclip className="w-4 h-4" />
+            </Button>
 
             <Input
               placeholder="Type a message..."
@@ -254,7 +338,8 @@ const JobMessages = () => {
               onClick={sendMessage}
               disabled={
                 sending ||
-                !newMessage.trim()
+                uploading ||
+                (!newMessage.trim() && attachments.length === 0)
               }
             >
 

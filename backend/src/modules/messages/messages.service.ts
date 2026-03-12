@@ -38,7 +38,7 @@ class MessagesService {
 
   async sendMessage(userId: string, payload: any) {
 
-    const { job_id, text } = payload;
+    const { job_id, text, attachments } = payload;
 
     const job = await messagesRepository.getJob(job_id);
     const profile = await messagesRepository.getProfile(userId);
@@ -62,7 +62,8 @@ class MessagesService {
       await messagesRepository.createMessage({
         job_id,
         sender_id: profile.id,
-        text
+        text: text || null,
+        attachments: attachments || []
       });
 
     const fastify = (global as any).fastify;
