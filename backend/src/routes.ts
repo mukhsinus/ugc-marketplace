@@ -9,6 +9,10 @@ import { messagesRoutes } from "./modules/messages/messages.routes";
 import { libraryRoutes } from "./modules/library/library.routes";
 import { creatorsRoutes } from "./modules/creators/creators.routes";
 import { brandsRoutes } from "./modules/brands/brands.routes";
+import { payoutsRoutes } from "./modules/payouts/payouts.routes";
+import { contractsRoutes } from "./modules/contracts/contracts.routes";
+
+
 
 export async function registerRoutes(app: FastifyInstance) {
 
@@ -42,5 +46,13 @@ export async function registerRoutes(app: FastifyInstance) {
 
   app.register(brandsRoutes, {
     prefix: "/api/brands",
+  });
+
+  app.register(payoutsRoutes, {
+    prefix: "/api/payouts",
+  });
+
+  app.register(contractsRoutes, {
+    prefix: "/api/contracts",
   });
 }
