@@ -1,4 +1,5 @@
 // backend/src/routes.ts
+
 import { FastifyInstance } from "fastify";
 
 import { authRoutes } from "./modules/auth/auth.routes";
@@ -11,48 +12,54 @@ import { creatorsRoutes } from "./modules/creators/creators.routes";
 import { brandsRoutes } from "./modules/brands/brands.routes";
 import { payoutsRoutes } from "./modules/payouts/payouts.routes";
 import { contractsRoutes } from "./modules/contracts/contracts.routes";
+import { adminRoutes } from "./modules/admin/admin.routes";
 
-
+const API_PREFIX = "/api/v1";
 
 export async function registerRoutes(app: FastifyInstance) {
 
   app.register(authRoutes, {
-    prefix: "/api/auth",
+    prefix: `${API_PREFIX}/auth`,
   });
 
   app.register(usersRoutes, {
-    prefix: "/api/users",
+    prefix: `${API_PREFIX}/users`,
   });
 
   app.register(jobsRoutes, {
-    prefix: "/api/jobs",
+    prefix: `${API_PREFIX}/jobs`,
   });
 
   app.register(proposalsRoutes, {
-    prefix: "/api/proposals",
+    prefix: `${API_PREFIX}/proposals`,
   });
 
   app.register(messagesRoutes, {
-    prefix: "/api/messages",
+    prefix: `${API_PREFIX}/messages`,
   });
 
   app.register(libraryRoutes, {
-    prefix: "/api/library",
+    prefix: `${API_PREFIX}/library`,
   });
 
   app.register(creatorsRoutes, {
-    prefix: "/api/creators",
+    prefix: `${API_PREFIX}/creators`,
   });
 
   app.register(brandsRoutes, {
-    prefix: "/api/brands",
+    prefix: `${API_PREFIX}/brands`,
   });
 
   app.register(payoutsRoutes, {
-    prefix: "/api/payouts",
+    prefix: `${API_PREFIX}/payouts`,
   });
 
   app.register(contractsRoutes, {
-    prefix: "/api/contracts",
+    prefix: `${API_PREFIX}/contracts`,
   });
+
+  app.register(adminRoutes, {
+    prefix: `${API_PREFIX}/admin`,
+  });
+
 }

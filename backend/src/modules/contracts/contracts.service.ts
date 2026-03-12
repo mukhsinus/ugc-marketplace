@@ -1,7 +1,7 @@
 // backend/src/modules/contracts/contracts.service.ts
-// backend/src/modules/contracts/contracts.service.ts
-
 import { supabaseAdmin } from "../../config/supabase";
+
+const PLATFORM_FEE_PERCENT = 0.10;
 
 export const contractsService = {
 
@@ -13,7 +13,7 @@ export const contractsService = {
     currency: string
   ) {
 
-    const { data: contract, error } = await supabaseAdmin
+    const { data, error } = await supabaseAdmin
       .from("contracts")
       .insert({
         job_id: jobId,
@@ -28,8 +28,9 @@ export const contractsService = {
 
     if (error) throw error;
 
-    return contract;
+    return data;
   },
+
 
   async getContractByJob(jobId: string) {
 
@@ -39,10 +40,11 @@ export const contractsService = {
       .eq("job_id", jobId)
       .single();
 
-    if (error) throw error;
+    if (error && error.code !== "PGRST116") throw error;
 
     return data;
   },
+
 
   async createEscrow(
     contractId: string,
@@ -52,7 +54,30 @@ export const contractsService = {
     currency: string
   ) {
 
-    const { data, error } = await supabaseAdmin
+    const { data: payerWallet } = await supabaseAdmin
+      .from("wallets")
+      .select("*")
+      .eq("id", payerWalletId)
+      .single();
+
+    if (!payerWallet) {
+      throw new Error("Payer wallet not found");
+    }
+
+    if (payerWallet.balance < amount) {
+      throw new Error("Insufficient wallet balance");
+    }
+
+    const { error: balanceError } = await supabaseAdmin
+      .from("wallets")
+      .update({
+        balance: payerWallet.balance - amount
+      })
+      .eq("id", payerWalletId);
+
+    if (balanceError) throw balanceError;
+
+    const { data: escrow, error } = await supabaseAdmin
       .from("escrow_accounts")
       .insert({
         contract_id: contractId,
@@ -67,8 +92,21 @@ export const contractsService = {
 
     if (error) throw error;
 
-    return data;
+    await supabaseAdmin
+      .from("transactions")
+      .insert({
+        wallet_id: payerWalletId,
+        contract_id: contractId,
+        type: "escrow_hold",
+        amount,
+        currency,
+        status: "completed",
+        description: "Escrow funds locked"
+      });
+
+    return escrow;
   },
+
 
   async releaseEscrow(contractId: string) {
 
@@ -82,16 +120,31 @@ export const contractsService = {
       throw new Error("Escrow not found");
     }
 
+    if (escrow.status !== "held") {
+      throw new Error("Escrow already processed");
+    }
+
+    const fee = escrow.amount * PLATFORM_FEE_PERCENT;
+    const creatorAmount = escrow.amount - fee;
+
+    const { data: creatorWallet } = await supabaseAdmin
+      .from("wallets")
+      .select("*")
+      .eq("id", escrow.payee_wallet_id)
+      .single();
+
+    if (!creatorWallet) {
+      throw new Error("Creator wallet not found");
+    }
+
     await supabaseAdmin
       .from("wallets")
       .update({
-        balance: supabaseAdmin.rpc("increment_balance", {
-          wallet_id: escrow.payee_wallet_id,
-          amount: escrow.amount
-        })
-      });
+        balance: creatorWallet.balance + creatorAmount
+      })
+      .eq("id", escrow.payee_wallet_id);
 
-    const { error } = await supabaseAdmin
+    await supabaseAdmin
       .from("escrow_accounts")
       .update({
         status: "released",
@@ -99,10 +152,32 @@ export const contractsService = {
       })
       .eq("id", escrow.id);
 
-    if (error) throw error;
+    await supabaseAdmin
+      .from("transactions")
+      .insert([
+        {
+          wallet_id: escrow.payee_wallet_id,
+          contract_id: contractId,
+          type: "payout",
+          amount: creatorAmount,
+          currency: escrow.currency,
+          status: "completed",
+          description: "Escrow released to creator"
+        },
+        {
+          wallet_id: escrow.payer_wallet_id,
+          contract_id: contractId,
+          type: "platform_fee",
+          amount: fee,
+          currency: escrow.currency,
+          status: "completed",
+          description: "Platform commission"
+        }
+      ]);
 
     return true;
   },
+
 
   async cancelEscrow(contractId: string) {
 
@@ -116,23 +191,41 @@ export const contractsService = {
       throw new Error("Escrow not found");
     }
 
+    if (escrow.status !== "held") {
+      throw new Error("Escrow already processed");
+    }
+
+    const { data: payerWallet } = await supabaseAdmin
+      .from("wallets")
+      .select("*")
+      .eq("id", escrow.payer_wallet_id)
+      .single();
+
     await supabaseAdmin
       .from("wallets")
       .update({
-        balance: supabaseAdmin.rpc("increment_balance", {
-          wallet_id: escrow.payer_wallet_id,
-          amount: escrow.amount
-        })
-      });
+        balance: payerWallet.balance + escrow.amount
+      })
+      .eq("id", escrow.payer_wallet_id);
 
-    const { error } = await supabaseAdmin
+    await supabaseAdmin
       .from("escrow_accounts")
       .update({
         status: "refunded"
       })
       .eq("id", escrow.id);
 
-    if (error) throw error;
+    await supabaseAdmin
+      .from("transactions")
+      .insert({
+        wallet_id: escrow.payer_wallet_id,
+        contract_id: contractId,
+        type: "refund",
+        amount: escrow.amount,
+        currency: escrow.currency,
+        status: "completed",
+        description: "Escrow refunded to brand"
+      });
 
     return true;
   }
