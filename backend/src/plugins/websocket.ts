@@ -1,69 +1,75 @@
 // backend/src/plugins/websocket.ts
-
 import { FastifyInstance } from "fastify";
-import websocket from "@fastify/websocket";
+import websocket, { SocketStream } from "@fastify/websocket";
+import { RawData, WebSocket } from "ws";
 
 export async function registerWebsocket(app: FastifyInstance) {
 
   await app.register(websocket);
 
-  const clients = new Map<string, Set<any>>();
+  const clients = new Map<string, Set<WebSocket>>();
 
-  app.get("/ws/messages/:jobId", { websocket: true }, (connection, req) => {
+  app.get<{ Params: { jobId: string } }>(
+    "/ws/messages/:jobId",
+    { websocket: true },
+    (connection: SocketStream, req) => {
 
-    const { jobId } = req.params as { jobId: string };
+      const { jobId } = req.params;
 
-    if (!clients.has(jobId)) {
-      clients.set(jobId, new Set());
-    }
+      if (!clients.has(jobId)) {
+        clients.set(jobId, new Set());
+      }
 
-    const sockets = clients.get(jobId)!;
+      const sockets = clients.get(jobId)!;
 
-    sockets.add(connection.socket);
+      sockets.add(connection.socket);
 
-    connection.socket.on("message", (raw: Buffer) => {
+      connection.socket.on("message", (raw: RawData) => {
 
-      try {
+        try {
 
-        const payload = JSON.parse(raw.toString());
+          const payload = JSON.parse(raw.toString());
 
-        if (
-          payload.type === "typing_start" ||
-          payload.type === "typing_stop"
-        ) {
+          if (
+            payload.type === "typing_start" ||
+            payload.type === "typing_stop"
+          ) {
 
-          for (const socket of sockets) {
+            for (const socket of sockets) {
 
-            if (socket !== connection.socket) {
+              if (socket !== connection.socket) {
 
-              socket.send(JSON.stringify({
-                type: payload.type,
-                data: payload.data || null
-              }));
+                socket.send(
+                  JSON.stringify({
+                    type: payload.type,
+                    data: payload.data ?? null
+                  })
+                );
+
+              }
 
             }
 
           }
 
+        } catch {
+          return;
         }
 
-      } catch {
-        return;
-      }
+      });
 
-    });
+      connection.socket.on("close", () => {
 
-    connection.socket.on("close", () => {
+        sockets.delete(connection.socket);
 
-      sockets.delete(connection.socket);
+        if (sockets.size === 0) {
+          clients.delete(jobId);
+        }
 
-      if (sockets.size === 0) {
-        clients.delete(jobId);
-      }
+      });
 
-    });
-
-  });
+    }
+  );
 
   app.decorate("broadcastMessage", (jobId: string, message: any) => {
 
@@ -75,10 +81,12 @@ export async function registerWebsocket(app: FastifyInstance) {
 
       try {
 
-        socket.send(JSON.stringify({
-          type: "message",
-          data: message
-        }));
+        socket.send(
+          JSON.stringify({
+            type: "message",
+            data: message
+          })
+        );
 
       } catch {
 
@@ -100,10 +108,12 @@ export async function registerWebsocket(app: FastifyInstance) {
 
       try {
 
-        socket.send(JSON.stringify({
-          type: "message_seen",
-          data: payload
-        }));
+        socket.send(
+          JSON.stringify({
+            type: "message_seen",
+            data: payload
+          })
+        );
 
       } catch {
 
@@ -125,10 +135,12 @@ export async function registerWebsocket(app: FastifyInstance) {
 
       try {
 
-        socket.send(JSON.stringify({
-          type: "message_deleted",
-          data: payload
-        }));
+        socket.send(
+          JSON.stringify({
+            type: "message_deleted",
+            data: payload
+          })
+        );
 
       } catch {
 

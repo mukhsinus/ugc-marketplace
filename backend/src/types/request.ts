@@ -1,14 +1,13 @@
 // backend/src/types/request.ts
-
 import "fastify";
 
-export interface AuthenticatedUser {
+export type AuthenticatedUser = {
   id: string;
   email?: string;
-}
+};
 
 declare module "fastify" {
   interface FastifyRequest {
-    user?: AuthenticatedUser;
+    user: AuthenticatedUser | undefined;
   }
 }
