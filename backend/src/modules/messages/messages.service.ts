@@ -3,6 +3,38 @@ import { messagesRepository } from "./messages.repository";
 
 class MessagesService {
 
+  async getConversations(userId: string) {
+
+    const profile =
+      await messagesRepository.getProfile(userId);
+
+    if (!profile) {
+      throw new Error("Invalid request");
+    }
+
+    const conversations =
+      await messagesRepository.getUserConversations(profile.id);
+
+    const unique = new Map();
+
+    for (const item of conversations || []) {
+
+      if (!unique.has(item.job_id)) {
+
+        unique.set(item.job_id, {
+          jobId: item.job_id,
+          title: item.jobs?.title,
+          brand: item.jobs?.profiles || null
+        });
+
+      }
+
+    }
+
+    return Array.from(unique.values());
+
+  }
+
   async getMessages(userId: string, jobId: string) {
 
     const job = await messagesRepository.getJob(jobId);
@@ -34,6 +66,7 @@ class MessagesService {
       },
       messages
     };
+
   }
 
   async sendMessage(userId: string, payload: any) {
@@ -69,10 +102,13 @@ class MessagesService {
     const fastify = (global as any).fastify;
 
     if (fastify && fastify.broadcastMessage) {
+
       fastify.broadcastMessage(job_id, message);
+
     }
 
     return message;
+
   }
 
   async markMessageSeen(userId: string, messageId: string) {
@@ -107,13 +143,49 @@ class MessagesService {
     const fastify = (global as any).fastify;
 
     if (fastify && fastify.broadcastMessageSeen) {
+
       fastify.broadcastMessageSeen(message.job_id, {
-        messageId: messageId,
+        messageId,
         seenAt: updated?.seen_at
       });
+
     }
 
     return updated;
+
+  }
+
+  async deleteMessage(userId: string, messageId: string) {
+
+    const message =
+      await messagesRepository.getMessage(messageId);
+
+    if (!message) {
+      throw new Error("Message not found");
+    }
+
+    const profile =
+      await messagesRepository.getProfile(userId);
+
+    if (message.sender_id !== profile.id) {
+      throw new Error("Forbidden");
+    }
+
+    const deleted =
+      await messagesRepository.deleteMessage(messageId);
+
+    const fastify = (global as any).fastify;
+
+    if (fastify && fastify.broadcastMessageDeleted) {
+
+      fastify.broadcastMessageDeleted(message.job_id, {
+        messageId
+      });
+
+    }
+
+    return deleted;
+
   }
 
 }

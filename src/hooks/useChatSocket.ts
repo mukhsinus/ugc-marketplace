@@ -4,12 +4,14 @@ import { useEffect, useRef } from "react";
 type ChatEvent =
   | { type: "message"; data: any }
   | { type: "message_seen"; data: { messageId: string; seenAt: string } }
+  | { type: "message_deleted"; data: { messageId: string } }
   | { type: "typing_start"; data?: { userId?: string; name?: string } }
   | { type: "typing_stop"; data?: { userId?: string } };
 
 interface Handlers {
   onMessage?: (message: any) => void;
   onSeen?: (payload: { messageId: string; seenAt: string }) => void;
+  onDelete?: (payload: { messageId: string }) => void;
   onTypingStart?: (payload?: { userId?: string; name?: string }) => void;
   onTypingStop?: (payload?: { userId?: string }) => void;
 }
@@ -39,6 +41,10 @@ export function useChatSocket(
 
         if (payload.type === "message_seen") {
           handlers.onSeen?.(payload.data);
+        }
+
+        if (payload.type === "message_deleted") {
+          handlers.onDelete?.(payload.data);
         }
 
         if (payload.type === "typing_start") {

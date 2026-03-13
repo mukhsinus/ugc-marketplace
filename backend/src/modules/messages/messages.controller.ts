@@ -2,6 +2,19 @@
 import { FastifyRequest, FastifyReply } from "fastify";
 import { messagesService } from "./messages.service";
 
+export async function getConversations(
+  request: FastifyRequest,
+  reply: FastifyReply
+) {
+
+  const conversations = await messagesService.getConversations(
+    request.user!.id
+  );
+
+  return reply.send(conversations);
+
+}
+
 export async function getMessages(
   request: FastifyRequest<{ Params: { jobId: string } }>,
   reply: FastifyReply
@@ -13,6 +26,7 @@ export async function getMessages(
   );
 
   return reply.send(messages);
+
 }
 
 export async function sendMessage(
@@ -26,6 +40,7 @@ export async function sendMessage(
   );
 
   return reply.status(201).send(message);
+
 }
 
 export async function markMessageSeen(
@@ -39,4 +54,19 @@ export async function markMessageSeen(
   );
 
   return reply.send(message);
+
+}
+
+export async function deleteMessage(
+  request: FastifyRequest<{ Params: { id: string } }>,
+  reply: FastifyReply
+) {
+
+  const message = await messagesService.deleteMessage(
+    request.user!.id,
+    request.params.id
+  );
+
+  return reply.send(message);
+
 }

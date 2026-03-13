@@ -1,4 +1,5 @@
 // backend/src/plugins/websocket.ts
+
 import { FastifyInstance } from "fastify";
 import websocket from "@fastify/websocket";
 
@@ -26,7 +27,10 @@ export async function registerWebsocket(app: FastifyInstance) {
 
         const payload = JSON.parse(raw.toString());
 
-        if (payload.type === "typing_start" || payload.type === "typing_stop") {
+        if (
+          payload.type === "typing_start" ||
+          payload.type === "typing_stop"
+        ) {
 
           for (const socket of sockets) {
 
@@ -98,6 +102,31 @@ export async function registerWebsocket(app: FastifyInstance) {
 
         socket.send(JSON.stringify({
           type: "message_seen",
+          data: payload
+        }));
+
+      } catch {
+
+        socket.close();
+
+      }
+
+    }
+
+  });
+
+  app.decorate("broadcastMessageDeleted", (jobId: string, payload: any) => {
+
+    const sockets = clients.get(jobId);
+
+    if (!sockets) return;
+
+    for (const socket of sockets) {
+
+      try {
+
+        socket.send(JSON.stringify({
+          type: "message_deleted",
           data: payload
         }));
 
