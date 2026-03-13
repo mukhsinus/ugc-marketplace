@@ -33,10 +33,14 @@ const DashboardLayout = ({ children, title }: { children: React.ReactNode; title
       <aside className="w-64 bg-surface border-r border-border hidden md:flex flex-col">
         <div className="p-4 border-b border-border">
           <Link to="/" className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
-              <span className="font-display font-bold text-primary-foreground text-sm">U</span>
+            <div className="flex items-center gap-2">
+              <img
+                src="/assets/logo.webp"
+                alt="UGC Market"
+                className="h-6 w-auto"
+              />
+              <span className="font-semibold text-sm">UGC Market</span>
             </div>
-            <span className="font-display font-bold text-lg">UGC Market</span>
           </Link>
         </div>
         <nav className="flex-1 p-4 space-y-1">
