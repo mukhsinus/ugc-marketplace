@@ -1,6 +1,6 @@
 // backend/src/plugins/websocket.ts
 import { FastifyInstance } from "fastify";
-import websocket, { SocketStream } from "@fastify/websocket";
+import websocket from "@fastify/websocket";
 import { RawData, WebSocket } from "ws";
 
 export async function registerWebsocket(app: FastifyInstance) {
@@ -12,7 +12,7 @@ export async function registerWebsocket(app: FastifyInstance) {
   app.get<{ Params: { jobId: string } }>(
     "/ws/messages/:jobId",
     { websocket: true },
-    (connection: SocketStream, req) => {
+    (connection: any, req) => {
 
       const { jobId } = req.params;
 

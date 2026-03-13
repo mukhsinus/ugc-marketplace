@@ -1,25 +1,12 @@
 // backend/src/middleware/auth.middleware.ts
-
 import { FastifyRequest, FastifyReply } from "fastify";
 import { supabaseAdmin } from "../config/supabase";
-
-export interface AuthenticatedUser {
-  id: string;
-  email?: string | null;
-}
-
-declare module "fastify" {
-  interface FastifyRequest {
-    user?: AuthenticatedUser;
-  }
-}
 
 export async function authMiddleware(
   request: FastifyRequest,
   reply: FastifyReply
 ) {
   try {
-
     const authHeader = request.headers.authorization;
 
     if (!authHeader) {
@@ -48,7 +35,7 @@ export async function authMiddleware(
 
     request.user = {
       id: data.user.id,
-      email: data.user.email,
+      email: data.user.email ?? undefined,
     };
 
   } catch (err) {
