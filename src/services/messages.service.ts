@@ -1,4 +1,5 @@
 // src/services/messages.service.ts
+
 import { api } from "@/lib/api";
 
 export type Attachment = {
@@ -12,17 +13,17 @@ export const messagesService = {
 
   async getConversations() {
 
-    const { data } = await api.get("/messages/conversations");
+    const res = await api.get("/messages/conversations");
 
-    return data;
+    return res.data ?? [];
 
   },
 
   async getJobMessages(jobId: string) {
 
-    const { data } = await api.get(`/messages/${jobId}`);
+    const res = await api.get(`/messages/${jobId}`);
 
-    return data;
+    return res.data ?? { messages: [] };
 
   },
 
@@ -38,12 +39,9 @@ export const messagesService = {
       attachments
     };
 
-    const { data } = await api.post(
-      `/messages/${jobId}`,
-      payload
-    );
+    const res = await api.post("/messages", payload);
 
-    return data;
+    return res.data;
 
   }
 

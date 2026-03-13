@@ -1,12 +1,20 @@
 // src/lib/api.ts
-const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:4000/api/v1";
+
+import { supabase } from "@/lib/supabase";
+
+const API_BASE_URL =
+  import.meta.env.VITE_API_URL || "http://localhost:4000/api/v1";
 
 async function request(
   path: string,
   options: RequestInit = {}
 ) {
 
-  const token = localStorage.getItem("access_token");
+  const {
+    data: { session }
+  } = await supabase.auth.getSession();
+
+  const token = session?.access_token;
 
   const headers: HeadersInit = {
     "Content-Type": "application/json",
@@ -19,17 +27,17 @@ async function request(
     headers
   });
 
+  const json = await res.json().catch(() => ({}));
+
   if (!res.ok) {
 
-    const error = await res.json().catch(() => ({}));
-
     throw new Error(
-      error.message || `API error: ${res.status}`
+      json.error || `API error: ${res.status}`
     );
 
   }
 
-  return res.json();
+  return json;
 }
 
 export const api = {

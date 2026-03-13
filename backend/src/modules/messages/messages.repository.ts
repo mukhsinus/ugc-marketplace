@@ -1,4 +1,5 @@
 // backend/src/modules/messages/messages.repository.ts
+
 import { supabaseAdmin } from "../../config/supabase";
 
 class MessagesRepository {
@@ -154,6 +155,7 @@ class MessagesRepository {
       .select(`
         job_id,
         created_at,
+        text,
         jobs(
           id,
           title,
@@ -165,7 +167,7 @@ class MessagesRepository {
           )
         )
       `)
-      .or(`sender_id.eq.${profileId},receiver_id.eq.${profileId}`)
+      .eq("sender_id", profileId)
       .order("created_at", { ascending: false });
 
     if (error) throw error;

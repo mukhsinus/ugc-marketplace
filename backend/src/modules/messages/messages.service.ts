@@ -1,21 +1,27 @@
 // backend/src/modules/messages/messages.service.ts
+
 import { messagesRepository } from "./messages.repository";
+
+interface SendMessagePayload {
+  job_id: string;
+  text?: string | null;
+  attachments?: any[];
+}
 
 class MessagesService {
 
   async getConversations(userId: string) {
 
-    const profile =
-      await messagesRepository.getProfile(userId);
+    const profile = await messagesRepository.getProfile(userId);
 
     if (!profile) {
-      throw new Error("Invalid request");
+      throw new Error("Profile not found");
     }
 
     const conversations =
       await messagesRepository.getUserConversations(profile.id);
 
-    const unique = new Map();
+    const unique = new Map<string, any>();
 
     for (const item of conversations || []) {
 
@@ -23,7 +29,7 @@ class MessagesService {
 
         unique.set(item.job_id, {
           jobId: item.job_id,
-          title: item.jobs?.title,
+          title: item.jobs?.title || null,
           brand: item.jobs?.profiles || null
         });
 
@@ -64,12 +70,12 @@ class MessagesService {
         title: job.title,
         brand: job.profiles || null
       },
-      messages
+      messages: messages || []
     };
 
   }
 
-  async sendMessage(userId: string, payload: any) {
+  async sendMessage(userId: string, payload: SendMessagePayload) {
 
     const { job_id, text, attachments } = payload;
 
@@ -99,12 +105,10 @@ class MessagesService {
         attachments: attachments || []
       });
 
-    const fastify = (global as any).fastify;
+    const fastify = (global as any)?.fastify;
 
-    if (fastify && fastify.broadcastMessage) {
-
+    if (fastify?.broadcastMessage) {
       fastify.broadcastMessage(job_id, message);
-
     }
 
     return message;
@@ -126,6 +130,10 @@ class MessagesService {
     const profile =
       await messagesRepository.getProfile(userId);
 
+    if (!profile || !job) {
+      throw new Error("Invalid request");
+    }
+
     const acceptedCreator =
       await messagesRepository.getAcceptedCreator(message.job_id);
 
@@ -140,9 +148,9 @@ class MessagesService {
     const updated =
       await messagesRepository.markAsSeen(messageId);
 
-    const fastify = (global as any).fastify;
+    const fastify = (global as any)?.fastify;
 
-    if (fastify && fastify.broadcastMessageSeen) {
+    if (fastify?.broadcastMessageSeen) {
 
       fastify.broadcastMessageSeen(message.job_id, {
         messageId,
@@ -167,6 +175,10 @@ class MessagesService {
     const profile =
       await messagesRepository.getProfile(userId);
 
+    if (!profile) {
+      throw new Error("Invalid request");
+    }
+
     if (message.sender_id !== profile.id) {
       throw new Error("Forbidden");
     }
@@ -174,9 +186,9 @@ class MessagesService {
     const deleted =
       await messagesRepository.deleteMessage(messageId);
 
-    const fastify = (global as any).fastify;
+    const fastify = (global as any)?.fastify;
 
-    if (fastify && fastify.broadcastMessageDeleted) {
+    if (fastify?.broadcastMessageDeleted) {
 
       fastify.broadcastMessageDeleted(message.job_id, {
         messageId

@@ -1,17 +1,18 @@
 // backend/src/modules/messages/messages.controller.ts
+
 import { FastifyRequest, FastifyReply } from "fastify";
 import { messagesService } from "./messages.service";
+import { success } from "../../utils/apiResponse";
 
 export async function getConversations(
   request: FastifyRequest,
   reply: FastifyReply
 ) {
 
-  const conversations = await messagesService.getConversations(
-    request.user!.id
-  );
+  const conversations =
+    await messagesService.getConversations(request.user!.id);
 
-  return reply.send(conversations);
+  return reply.send(success(conversations));
 
 }
 
@@ -20,12 +21,13 @@ export async function getMessages(
   reply: FastifyReply
 ) {
 
-  const messages = await messagesService.getMessages(
-    request.user!.id,
-    request.params.jobId
-  );
+  const result =
+    await messagesService.getMessages(
+      request.user!.id,
+      request.params.jobId
+    );
 
-  return reply.send(messages);
+  return reply.send(success(result));
 
 }
 
@@ -34,12 +36,15 @@ export async function sendMessage(
   reply: FastifyReply
 ) {
 
-  const message = await messagesService.sendMessage(
-    request.user!.id,
-    request.body as any
-  );
+  const message =
+    await messagesService.sendMessage(
+      request.user!.id,
+      request.body as any
+    );
 
-  return reply.status(201).send(message);
+  return reply
+    .status(201)
+    .send(success(message));
 
 }
 
@@ -48,12 +53,13 @@ export async function markMessageSeen(
   reply: FastifyReply
 ) {
 
-  const message = await messagesService.markMessageSeen(
-    request.user!.id,
-    request.params.id
-  );
+  const message =
+    await messagesService.markMessageSeen(
+      request.user!.id,
+      request.params.id
+    );
 
-  return reply.send(message);
+  return reply.send(success(message));
 
 }
 
@@ -62,11 +68,12 @@ export async function deleteMessage(
   reply: FastifyReply
 ) {
 
-  const message = await messagesService.deleteMessage(
-    request.user!.id,
-    request.params.id
-  );
+  const message =
+    await messagesService.deleteMessage(
+      request.user!.id,
+      request.params.id
+    );
 
-  return reply.send(message);
+  return reply.send(success(message));
 
 }

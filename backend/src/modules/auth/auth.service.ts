@@ -8,7 +8,7 @@ class AuthService {
     const { data, error } = await supabaseAdmin
       .from("profiles")
       .select("*")
-      .eq("user_id", userId)
+      .eq("id", userId)
       .single();
 
     if (error) {
@@ -21,8 +21,7 @@ class AuthService {
 
   async logout() {
 
-    // Supabase JWT logout handled client-side
-    // This endpoint exists for API symmetry
+    // JWT logout handled on client
     return true;
 
   }

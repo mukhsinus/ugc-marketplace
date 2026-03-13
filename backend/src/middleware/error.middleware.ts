@@ -1,5 +1,7 @@
 // backend/src/middleware/error.middleware.ts
+
 import { FastifyInstance, FastifyRequest, FastifyReply } from "fastify";
+import { failure } from "../utils/apiResponse";
 
 export function registerErrorHandler(app: FastifyInstance) {
 
@@ -8,22 +10,28 @@ export function registerErrorHandler(app: FastifyInstance) {
 
       request.log.error(error);
 
+      // Validation errors (Zod / Fastify schema)
       if (error.validation) {
-        return reply.status(400).send({
-          error: "Validation error",
-          details: error.validation
-        });
+
+        return reply.status(400).send(
+          failure("Validation error")
+        );
+
       }
 
+      // Known application errors
       if (error.statusCode) {
-        return reply.status(error.statusCode).send({
-          error: error.message
-        });
+
+        return reply.status(error.statusCode).send(
+          failure(error.message)
+        );
+
       }
 
-      return reply.status(500).send({
-        error: "Internal server error"
-      });
+      // Unknown errors
+      return reply.status(500).send(
+        failure("Internal server error")
+      );
 
     }
   );

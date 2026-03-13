@@ -13,6 +13,7 @@ import { brandsRoutes } from "./modules/brands/brands.routes";
 import { payoutsRoutes } from "./modules/payouts/payouts.routes";
 import { contractsRoutes } from "./modules/contracts/contracts.routes";
 import { adminRoutes } from "./modules/admin/admin.routes";
+import { portfolioRoutes } from "./modules/portfolio/portfolio.routes";
 
 const API_PREFIX = "/api/v1";
 
@@ -60,6 +61,10 @@ export async function registerRoutes(app: FastifyInstance) {
 
   app.register(adminRoutes, {
     prefix: `${API_PREFIX}/admin`,
+  });
+
+  app.register(portfolioRoutes, {
+    prefix: `${API_PREFIX}/portfolio`,
   });
 
 }
