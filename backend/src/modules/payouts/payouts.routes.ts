@@ -22,7 +22,7 @@ export async function payoutsRoutes(app: FastifyInstance) {
     createPayout
   );
 
-  app.patch(
+  app.patch<{ Params: { id: string } }>(
     "/:id",
     { preHandler: authMiddleware },
     updatePayoutStatus

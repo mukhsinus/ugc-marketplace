@@ -9,7 +9,7 @@ import {
 
 export async function submissionsRoutes(app: FastifyInstance) {
 
-  app.get(
+  app.get<{ Params: { jobId: string } }>(
     "/job/:jobId",
     { preHandler: authMiddleware },
     getJobSubmissions
@@ -21,7 +21,7 @@ export async function submissionsRoutes(app: FastifyInstance) {
     createSubmission
   );
 
-  app.patch(
+  app.patch<{ Params: { id: string } }>(
     "/:id",
     { preHandler: authMiddleware },
     updateSubmission

@@ -14,7 +14,7 @@ export async function libraryRoutes(app: FastifyInstance) {
   app.get("/", getLibrary);
 
   // single item
-  app.get("/:id", getLibraryItem);
+  app.get<{ Params: { id: string } }>("/:id", getLibraryItem);
 
   // upload content
   app.post(
@@ -24,7 +24,7 @@ export async function libraryRoutes(app: FastifyInstance) {
   );
 
   // delete content
-  app.delete(
+  app.delete<{ Params: { id: string } }>(
     "/:id",
     { preHandler: authMiddleware },
     deleteLibraryItem

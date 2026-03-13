@@ -9,19 +9,19 @@ import {
 
 export async function proposalsRoutes(app: FastifyInstance) {
 
-  app.get(
+  app.get<{ Params: { jobId: string } }>(
     "/job/:jobId",
     { preHandler: authMiddleware },
     getJobProposals
   );
 
-  app.post(
+  app.post<{ Params: { jobId: string } }>(
     "/job/:jobId",
     { preHandler: authMiddleware },
     createProposal
   );
 
-  app.patch(
+  app.patch<{ Params: { id: string } }>(
     "/:id",
     { preHandler: authMiddleware },
     updateProposal

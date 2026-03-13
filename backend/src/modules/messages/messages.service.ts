@@ -29,8 +29,8 @@ class MessagesService {
 
         unique.set(item.job_id, {
           jobId: item.job_id,
-          title: item.jobs?.title || null,
-          brand: item.jobs?.profiles || null
+          title: item.jobs?.[0]?.title || null,
+          brand: item.jobs?.[0]?.profiles || null
         });
 
       }

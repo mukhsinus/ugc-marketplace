@@ -18,7 +18,7 @@ export async function contractsRoutes(app: FastifyInstance) {
     createContract
   );
 
-  app.get(
+  app.get<{ Params: { jobId: string } }>(
     "/job/:jobId",
     { preHandler: authMiddleware },
     getContractByJob
@@ -30,13 +30,13 @@ export async function contractsRoutes(app: FastifyInstance) {
     createEscrow
   );
 
-  app.patch(
+  app.patch<{ Params: { contractId: string } }>(
     "/:contractId/release",
     { preHandler: authMiddleware },
     releaseEscrow
   );
 
-  app.patch(
+  app.patch<{ Params: { contractId: string } }>(
     "/:contractId/cancel",
     { preHandler: authMiddleware },
     cancelEscrow

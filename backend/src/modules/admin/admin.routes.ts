@@ -22,13 +22,13 @@ export async function adminRoutes(app: FastifyInstance) {
     getUsers
   );
 
-  app.patch(
+  app.patch<{ Params: { id: string } }>(
     "/users/:id/ban",
     { preHandler: [authMiddleware, adminMiddleware] },
     banUser
   );
 
-  app.patch(
+  app.patch<{ Params: { id: string } }>(
     "/users/:id/unban",
     { preHandler: [authMiddleware, adminMiddleware] },
     unbanUser
@@ -40,13 +40,13 @@ export async function adminRoutes(app: FastifyInstance) {
     getPayouts
   );
 
-  app.patch(
+  app.patch<{ Params: { id: string } }>(
     "/payouts/:id/approve",
     { preHandler: [authMiddleware, adminMiddleware] },
     approvePayout
   );
 
-  app.patch(
+  app.patch<{ Params: { id: string } }>(
     "/payouts/:id/reject",
     { preHandler: [authMiddleware, adminMiddleware] },
     rejectPayout
@@ -58,7 +58,7 @@ export async function adminRoutes(app: FastifyInstance) {
     getJobs
   );
 
-  app.delete(
+  app.delete<{ Params: { id: string } }>(
     "/jobs/:id",
     { preHandler: [authMiddleware, adminMiddleware] },
     deleteJob

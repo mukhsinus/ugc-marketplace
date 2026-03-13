@@ -12,7 +12,7 @@ export async function jobsRoutes(app: FastifyInstance) {
 
   app.get("/", getJobs);
 
-  app.get("/:id", getJobById);
+  app.get<{ Params: { id: string } }>("/:id", getJobById);
 
   app.post(
     "/",
@@ -20,7 +20,7 @@ export async function jobsRoutes(app: FastifyInstance) {
     createJob
   );
 
-  app.patch(
+  app.patch<{ Params: { id: string } }>(
     "/:id",
     { preHandler: authMiddleware },
     updateJob

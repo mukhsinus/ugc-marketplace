@@ -1,4 +1,5 @@
 // backend/src/modules/messages/messages.routes.ts
+
 import { FastifyInstance } from "fastify";
 import { authMiddleware } from "../../middleware/auth.middleware";
 
@@ -18,7 +19,7 @@ export async function messagesRoutes(app: FastifyInstance) {
     getConversations
   );
 
-  app.get(
+  app.get<{ Params: { jobId: string } }>(
     "/:jobId",
     { preHandler: authMiddleware },
     getMessages
@@ -30,13 +31,13 @@ export async function messagesRoutes(app: FastifyInstance) {
     sendMessage
   );
 
-  app.patch(
+  app.patch<{ Params: { id: string } }>(
     "/:id/seen",
     { preHandler: authMiddleware },
     markMessageSeen
   );
 
-  app.delete(
+  app.delete<{ Params: { id: string } }>(
     "/:id",
     { preHandler: authMiddleware },
     deleteMessage
