@@ -1,11 +1,35 @@
 // backend/src/modules/auth/auth.routes.ts
+
 import { FastifyInstance } from "fastify";
 import { authMiddleware } from "../../middleware/auth.middleware";
-import { getCurrentUser, logout } from "./auth.controller";
+
+import {
+  login,
+  signup,
+  getCurrentUser,
+  logout
+} from "./auth.controller";
 
 export async function authRoutes(app: FastifyInstance) {
 
-  // Current authenticated user
+  // --------------------------------
+  // AUTH
+  // --------------------------------
+
+  app.post(
+    "/login",
+    login
+  );
+
+  app.post(
+    "/signup",
+    signup
+  );
+
+  // --------------------------------
+  // CURRENT USER
+  // --------------------------------
+
   app.get(
     "/me",
     {
@@ -14,7 +38,10 @@ export async function authRoutes(app: FastifyInstance) {
     getCurrentUser
   );
 
-  // Logout endpoint (optional)
+  // --------------------------------
+  // LOGOUT
+  // --------------------------------
+
   app.post(
     "/logout",
     {
