@@ -14,38 +14,68 @@ const HowItWorks = () => {
   return (
     <section className="py-24 bg-background">
       <div className="container mx-auto px-4">
+
         <div className="text-center mb-16">
           <motion.h2
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
             className="text-3xl md:text-5xl font-bold mb-4"
           >
             {t("how.title")}
           </motion.h2>
-          <p className="text-muted-foreground text-lg">{t("how.subtitle")}</p>
+
+          <p className="text-muted-foreground text-lg">
+            {t("how.subtitle")}
+          </p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+
           {steps.map((step, i) => (
             <motion.div
               key={step.num}
-              initial={{ opacity: 0, y: 30 }}
+              initial={{ opacity: 0, y: 40 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: i * 0.15 }}
               className="relative text-center p-8 rounded-2xl bg-surface border border-border hover:border-primary/30 transition-all group"
             >
+
               <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-primary text-primary-foreground w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold font-display">
                 {step.num}
               </div>
-              <div className="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center mx-auto mb-5 group-hover:bg-primary/20 transition-colors">
-                <step.icon className="w-6 h-6 text-primary" />
+
+              {/* SLOT CONTAINER */}
+              <div className="w-14 h-14 rounded-full bg-primary/10 mx-auto mb-5 flex items-center justify-center relative">
+
+                <motion.div
+                  initial={{ opacity: 0, y: -20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{
+                    duration: 0.6,
+                    ease: "easeOut",
+                    delay: i * 0.15 + 0.5
+                  }}
+                >
+                  <step.icon className="w-6 h-6 text-primary" />
+                </motion.div>
+
               </div>
-              <h3 className="font-display font-semibold text-lg mb-3">{step.title}</h3>
-              <p className="text-muted-foreground text-sm">{step.desc}</p>
+
+              <h3 className="font-display font-semibold text-lg mb-3">
+                {step.title}
+              </h3>
+
+              <p className="text-muted-foreground text-sm">
+                {step.desc}
+              </p>
+
             </motion.div>
           ))}
+
         </div>
       </div>
     </section>

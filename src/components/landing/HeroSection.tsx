@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ArrowRight, Play } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import CountUp from "@/components/ui/countUp";
 import { useI18n } from "@/lib/i18n";
 
 const HeroSection = () => {
@@ -75,12 +76,14 @@ const HeroSection = () => {
             className="grid grid-cols-3 gap-8 mt-16 max-w-lg mx-auto"
           >
             {[
-              { value: "500+", label: t("hero.stats.creators") },
-              { value: "120+", label: t("hero.stats.brands") },
-              { value: "2,000+", label: t("hero.stats.videos") },
+              { value: 500, suffix: "+", label: t("hero.stats.creators") },
+              { value: 120, suffix: "+", label: t("hero.stats.brands") },
+              { value: 2000, suffix: "+", label: t("hero.stats.videos") },
             ].map((stat) => (
               <div key={stat.label} className="text-center">
-                <div className="text-2xl md:text-3xl font-display font-bold text-primary-foreground">{stat.value}</div>
+                <div className="text-2xl md:text-3xl font-display font-bold text-primary-foreground">
+                  <CountUp end={stat.value} suffix={stat.suffix} />
+                </div>
                 <div className="text-xs md:text-sm text-primary-foreground/50 mt-1">{stat.label}</div>
               </div>
             ))}

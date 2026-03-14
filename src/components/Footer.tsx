@@ -7,7 +7,7 @@ const Footer = () => {
 
   return (
     <footer className="bg-surface border-t border-border">
-      <div className="container mx-auto px-4 py-12">
+      <div className="container mx-auto px-4 pb-6 pt-12">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           
           {/* Brand block (always visible) */}
@@ -97,7 +97,7 @@ const Footer = () => {
 
         </div>
 
-        <div className="border-t border-border mt-8 pt-8 text-center text-sm text-muted-foreground">
+        <div className="border-t border-border mt-8 pt-4 text-center text-sm text-muted-foreground">
           © {new Date().getFullYear()} UGC Market. {t("footer.rights")}
         </div>
       </div>
