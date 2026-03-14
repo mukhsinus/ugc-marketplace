@@ -1,4 +1,5 @@
 // backend/src/modules/admin/admin.repository.ts
+
 import { supabaseAdmin } from "../../config/supabase";
 
 export const adminRepository = {
@@ -62,8 +63,9 @@ export const adminRepository = {
         *,
         profiles:brand_id (
           id,
-          email,
-          role
+          name,
+          company_name,
+          email
         )
       `)
       .order("created_at", { ascending: false });
@@ -81,6 +83,71 @@ export const adminRepository = {
       .from("jobs")
       .delete()
       .eq("id", jobId)
+      .select()
+      .single();
+
+    if (error) throw error;
+
+    return data;
+
+  },
+
+
+  // -------------------------------
+  // DASHBOARD DATA
+  // -------------------------------
+
+  async getDashboardData() {
+
+    const [profilesRes, jobsRes, settingsRes] = await Promise.all([
+
+      supabaseAdmin
+        .from("profiles")
+        .select("*")
+        .order("created_at", { ascending: false }),
+
+      supabaseAdmin
+        .from("jobs")
+        .select(`
+          *,
+          profiles:brand_id (
+            id,
+            name,
+            company_name
+          )
+        `)
+        .order("created_at", { ascending: false }),
+
+      supabaseAdmin
+        .from("platform_settings")
+        .select("*")
+        .eq("key", "commission_rate")
+        .single()
+
+    ]);
+
+    if (profilesRes.error) throw profilesRes.error;
+    if (jobsRes.error) throw jobsRes.error;
+
+    return {
+      profiles: profilesRes.data || [],
+      jobs: jobsRes.data || [],
+      commission: settingsRes.data?.value || "15"
+    };
+
+  },
+
+
+  // -------------------------------
+  // PLATFORM SETTINGS
+  // -------------------------------
+
+  async updateCommission(value: string) {
+
+    const { data, error } = await supabaseAdmin
+      .from("platform_settings")
+      .update({ value })
+      .eq("key", "commission_rate")
       .select()
       .single();
 
