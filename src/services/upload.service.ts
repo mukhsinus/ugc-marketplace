@@ -1,5 +1,7 @@
 // src/services/upload.service.ts
-import { supabase } from "@/integrations/supabase/client";
+
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL!;
+const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY!;
 
 const BUCKET = "chat-attachments";
 
@@ -16,28 +18,28 @@ function detectType(file: File): Attachment["type"] {
   return "file";
 }
 
-async function upload(file: File) {
+async function upload(file: File): Promise<string> {
+
   const ext = file.name.split(".").pop();
   const path = `chat/${crypto.randomUUID()}.${ext}`;
 
-  const { error } = await supabase
-    .storage
-    .from(BUCKET)
-    .upload(path, file, {
-      cacheControl: "3600",
-      upsert: false
-    });
+  const uploadUrl =
+    `${SUPABASE_URL}/storage/v1/object/${BUCKET}/${path}`;
 
-  if (error) {
-    throw error;
+  const res = await fetch(uploadUrl, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${SUPABASE_ANON_KEY}`
+    },
+    body: file
+  });
+
+  if (!res.ok) {
+    throw new Error("Upload failed");
   }
 
-  const { data } = supabase
-    .storage
-    .from(BUCKET)
-    .getPublicUrl(path);
+  return `${SUPABASE_URL}/storage/v1/object/public/${BUCKET}/${path}`;
 
-  return data.publicUrl;
 }
 
 export async function uploadVideo(file: File) {
