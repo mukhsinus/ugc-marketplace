@@ -1,7 +1,19 @@
 // src/lib/auth.tsx
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  ReactNode
+} from "react";
 
-import { createContext, useContext, useEffect, useState, ReactNode } from "react";
 import { api } from "@/lib/api";
+
+const TOKEN_KEY = "ugc_token";
+
+/* ------------------------------------------------ */
+/* TYPES */
+/* ------------------------------------------------ */
 
 type User = {
   id: string;
@@ -41,11 +53,27 @@ type AuthContextType = {
   session: Session | null;
   profile: Profile | null;
   loading: boolean;
-  signUp: (email: string, password: string, role: string, name: string) => Promise<{ error: any }>;
-  signIn: (email: string, password: string) => Promise<{ error: any }>;
+
+  signUp: (
+    email: string,
+    password: string,
+    role: string,
+    name: string
+  ) => Promise<{ error: any }>;
+
+  signIn: (
+    email: string,
+    password: string
+  ) => Promise<{ error: any }>;
+
   signOut: () => Promise<void>;
+
   refreshProfile: () => Promise<void>;
 };
+
+/* ------------------------------------------------ */
+/* CONTEXT */
+/* ------------------------------------------------ */
 
 const AuthContext = createContext<AuthContextType>({
   user: null,
@@ -55,17 +83,30 @@ const AuthContext = createContext<AuthContextType>({
   signUp: async () => ({ error: null }),
   signIn: async () => ({ error: null }),
   signOut: async () => {},
-  refreshProfile: async () => {},
+  refreshProfile: async () => {}
 });
 
-const TOKEN_KEY = "ugc_token";
+/* ------------------------------------------------ */
+/* PROVIDER */
+/* ------------------------------------------------ */
 
-export const AuthProvider = ({ children }: { children: ReactNode }) => {
+export const AuthProvider = ({
+  children
+}: {
+  children: ReactNode;
+}) => {
 
   const [user, setUser] = useState<User | null>(null);
+
   const [session, setSession] = useState<Session | null>(null);
+
   const [profile, setProfile] = useState<Profile | null>(null);
+
   const [loading, setLoading] = useState(true);
+
+  /* ------------------------------------------------ */
+  /* PROFILE LOAD */
+  /* ------------------------------------------------ */
 
   const fetchProfile = async () => {
 
@@ -82,7 +123,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         email: data.email
       });
 
-    } catch {
+    } catch (err) {
+
+      console.error("Profile fetch error:", err);
 
       setUser(null);
       setProfile(null);
@@ -95,22 +138,38 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     await fetchProfile();
   };
 
+  /* ------------------------------------------------ */
+  /* INITIAL AUTH CHECK */
+  /* ------------------------------------------------ */
+
   useEffect(() => {
 
-    const token = localStorage.getItem(TOKEN_KEY);
+    const initAuth = async () => {
 
-    if (!token) {
+      const token = localStorage.getItem(TOKEN_KEY);
+
+      if (!token) {
+        setLoading(false);
+        return;
+      }
+
+      setSession({
+        access_token: token
+      });
+
+      await fetchProfile();
+
       setLoading(false);
-      return;
-    }
 
-    setSession({ access_token: token });
+    };
 
-    fetchProfile().finally(() => {
-      setLoading(false);
-    });
+    initAuth();
 
   }, []);
+
+  /* ------------------------------------------------ */
+  /* SIGNUP */
+/* ------------------------------------------------ */
 
   const signUp = async (
     email: string,
@@ -130,11 +189,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
       const data = res?.data ?? res;
 
-      if (data?.access_token) {
+      if (data?.session?.access_token) {
 
-        localStorage.setItem(TOKEN_KEY, data.access_token);
+        const token = data.session.access_token;
 
-        setSession({ access_token: data.access_token });
+        localStorage.setItem(TOKEN_KEY, token);
+
+        setSession({ access_token: token });
 
         await fetchProfile();
 
@@ -144,13 +205,22 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     } catch (error) {
 
+      console.error("Signup error:", error);
+
       return { error };
 
     }
 
   };
 
-  const signIn = async (email: string, password: string) => {
+  /* ------------------------------------------------ */
+  /* SIGNIN */
+/* ------------------------------------------------ */
+
+  const signIn = async (
+    email: string,
+    password: string
+  ) => {
 
     try {
 
@@ -161,11 +231,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
       const data = res?.data ?? res;
 
-      if (data?.access_token) {
+      if (data?.session?.access_token) {
 
-        localStorage.setItem(TOKEN_KEY, data.access_token);
+        const token = data.session.access_token;
 
-        setSession({ access_token: data.access_token });
+        localStorage.setItem(TOKEN_KEY, token);
+
+        setSession({ access_token: token });
 
         await fetchProfile();
 
@@ -175,11 +247,17 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     } catch (error) {
 
+      console.error("Login error:", error);
+
       return { error };
 
     }
 
   };
+
+  /* ------------------------------------------------ */
+  /* LOGOUT */
+/* ------------------------------------------------ */
 
   const signOut = async () => {
 
@@ -190,6 +268,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setSession(null);
 
   };
+
+  /* ------------------------------------------------ */
+  /* PROVIDER */
+/* ------------------------------------------------ */
 
   return (
     <AuthContext.Provider
@@ -209,5 +291,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   );
 
 };
+
+/* ------------------------------------------------ */
+/* HOOK */
+/* ------------------------------------------------ */
 
 export const useAuth = () => useContext(AuthContext);

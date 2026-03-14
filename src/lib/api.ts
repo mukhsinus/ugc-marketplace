@@ -1,16 +1,29 @@
 // src/lib/api.ts
 
 const API_BASE_URL =
-  import.meta.env.VITE_API_URL || "http://localhost:4000/api/v1";
+  import.meta.env.VITE_API_URL ||
+  "https://ugc-marketplace-production.up.railway.app/api/v1";
 
-const TOKEN_KEY = "ugc_token";
+export const TOKEN_KEY = "ugc_token";
+
+export function getToken() {
+  return localStorage.getItem(TOKEN_KEY);
+}
+
+export function setToken(token: string) {
+  localStorage.setItem(TOKEN_KEY, token);
+}
+
+export function clearToken() {
+  localStorage.removeItem(TOKEN_KEY);
+}
 
 async function request(
   path: string,
   options: RequestInit = {}
 ) {
 
-  const token = localStorage.getItem(TOKEN_KEY);
+  const token = getToken();
 
   const headers: HeadersInit = {
     "Content-Type": "application/json",

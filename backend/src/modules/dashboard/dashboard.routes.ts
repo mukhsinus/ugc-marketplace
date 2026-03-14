@@ -6,7 +6,7 @@ import { authMiddleware } from "../../middleware/auth.middleware";
 import {
   getBrandDashboard,
   getCreatorDashboard
-} from "./dashboard.controller.js";
+} from "./dashboard.controller";
 
 export async function dashboardRoutes(app: FastifyInstance) {
 
