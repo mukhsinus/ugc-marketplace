@@ -25,6 +25,8 @@ const CreatorDashboard = () => {
     messages: 0
   });
 
+  const [loading, setLoading] = useState(true);
+
   useEffect(() => {
 
     if (!profile) return;
@@ -35,17 +37,21 @@ const CreatorDashboard = () => {
 
         const res = await api.get("/dashboard/creator");
 
-        const data = res.data ?? res;
+        const data = res?.data ?? res ?? {};
 
         setStats({
-          proposals: data.proposals || 0,
-          activeJobs: data.activeJobs || 0,
-          messages: data.messages || 0
+          proposals: data.proposals ?? 0,
+          activeJobs: data.activeJobs ?? 0,
+          messages: data.messages ?? 0
         });
 
       } catch (err) {
 
         console.error("Creator dashboard load error:", err);
+
+      } finally {
+
+        setLoading(false);
 
       }
 
@@ -74,7 +80,7 @@ const CreatorDashboard = () => {
 
           <CardContent>
             <div className="text-2xl font-bold">
-              {stats.proposals}
+              {loading ? "—" : stats.proposals}
             </div>
           </CardContent>
 
@@ -94,7 +100,7 @@ const CreatorDashboard = () => {
 
           <CardContent>
             <div className="text-2xl font-bold">
-              {stats.activeJobs}
+              {loading ? "—" : stats.activeJobs}
             </div>
           </CardContent>
 
@@ -115,11 +121,11 @@ const CreatorDashboard = () => {
           <CardContent>
 
             <div className="text-2xl font-bold">
-              {profile?.rating || "N/A"}
+              {profile?.rating ?? "N/A"}
             </div>
 
             <p className="text-xs text-muted-foreground">
-              {profile?.review_count || 0} reviews
+              {profile?.review_count ?? 0} reviews
             </p>
 
           </CardContent>
@@ -131,7 +137,9 @@ const CreatorDashboard = () => {
       <div className="flex gap-4">
 
         <Link to="/jobs">
-          <Button>Browse Jobs</Button>
+          <Button>
+            Browse Jobs
+          </Button>
         </Link>
 
         <Link to="/dashboard/portfolio">

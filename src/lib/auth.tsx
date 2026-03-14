@@ -1,8 +1,16 @@
 // src/lib/auth.tsx
 
 import { createContext, useContext, useEffect, useState, ReactNode } from "react";
-import { User, Session } from "@supabase/supabase-js";
-import { supabase } from "@/lib/supabase";
+import { api } from "@/lib/api";
+
+type User = {
+  id: string;
+  email: string;
+};
+
+type Session = {
+  access_token: string;
+};
 
 type Profile = {
   id: string;
@@ -50,6 +58,8 @@ const AuthContext = createContext<AuthContextType>({
   refreshProfile: async () => {},
 });
 
+const TOKEN_KEY = "ugc_token";
+
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const [user, setUser] = useState<User | null>(null);
@@ -57,66 +67,48 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const fetchProfile = async (userId: string) => {
+  const fetchProfile = async () => {
 
-    const { data, error } = await supabase
-      .from("profiles")
-      .select("*")
-      .eq("id", userId)   // ✅ FIX: теперь profiles.id = auth.users.id
-      .single();
+    try {
 
-    if (!error && data) {
-      setProfile(data as Profile);
-    } else {
+      const res = await api.get("/users/me");
+
+      const data = res?.data ?? res;
+
+      setProfile(data);
+
+      setUser({
+        id: data.id,
+        email: data.email
+      });
+
+    } catch {
+
+      setUser(null);
       setProfile(null);
+
     }
 
   };
 
   const refreshProfile = async () => {
-    if (user) {
-      await fetchProfile(user.id);
-    }
+    await fetchProfile();
   };
 
   useEffect(() => {
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (_event, session) => {
+    const token = localStorage.getItem(TOKEN_KEY);
 
-        setSession(session);
-        setUser(session?.user ?? null);
-
-        if (session?.user) {
-
-          // небольшой defer чтобы избежать deadlock supabase клиента
-          setTimeout(() => {
-            fetchProfile(session.user.id);
-          }, 0);
-
-        } else {
-          setProfile(null);
-        }
-
-        setLoading(false);
-
-      }
-    );
-
-    supabase.auth.getSession().then(({ data: { session } }) => {
-
-      setSession(session);
-      setUser(session?.user ?? null);
-
-      if (session?.user) {
-        fetchProfile(session.user.id);
-      }
-
+    if (!token) {
       setLoading(false);
+      return;
+    }
 
+    setSession({ access_token: token });
+
+    fetchProfile().finally(() => {
+      setLoading(false);
     });
-
-    return () => subscription.unsubscribe();
 
   }, []);
 
@@ -127,34 +119,75 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     name: string
   ) => {
 
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        data: { role, name },
-        emailRedirectTo: window.location.origin,
-      },
-    });
+    try {
 
-    return { error };
+      const res = await api.post("/auth/signup", {
+        email,
+        password,
+        role,
+        name
+      });
+
+      const data = res?.data ?? res;
+
+      if (data?.access_token) {
+
+        localStorage.setItem(TOKEN_KEY, data.access_token);
+
+        setSession({ access_token: data.access_token });
+
+        await fetchProfile();
+
+      }
+
+      return { error: null };
+
+    } catch (error) {
+
+      return { error };
+
+    }
 
   };
 
   const signIn = async (email: string, password: string) => {
 
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
+    try {
 
-    return { error };
+      const res = await api.post("/auth/login", {
+        email,
+        password
+      });
+
+      const data = res?.data ?? res;
+
+      if (data?.access_token) {
+
+        localStorage.setItem(TOKEN_KEY, data.access_token);
+
+        setSession({ access_token: data.access_token });
+
+        await fetchProfile();
+
+      }
+
+      return { error: null };
+
+    } catch (error) {
+
+      return { error };
+
+    }
 
   };
 
   const signOut = async () => {
 
-    await supabase.auth.signOut();
+    localStorage.removeItem(TOKEN_KEY);
+
+    setUser(null);
     setProfile(null);
+    setSession(null);
 
   };
 

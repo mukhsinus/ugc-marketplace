@@ -1,5 +1,4 @@
 // backend/src/modules/admin/admin.service.ts
-
 import { adminRepository } from "./admin.repository";
 import { payoutsService } from "../payouts/payouts.service";
 
@@ -37,19 +36,15 @@ export const adminService = {
     return adminRepository.deleteJob(jobId);
   },
 
-  // -------------------------
-  // DASHBOARD
-  // -------------------------
-
   async getDashboard() {
 
     const data = await adminRepository.getDashboardData();
 
-    const profiles = data.profiles || [];
-    const jobs = data.jobs || [];
+    const profiles = data.profiles;
+    const jobs = data.jobs;
 
-    const creators = profiles.filter(p => p.role === "creator").length;
-    const brands = profiles.filter(p => p.role === "brand").length;
+    const creators = profiles.filter((p: any) => p.role === "creator").length;
+    const brands = profiles.filter((p: any) => p.role === "brand").length;
 
     const jobsCount = jobs.length;
 
@@ -81,11 +76,7 @@ export const adminService = {
 
   },
 
-  // -------------------------
-  // PLATFORM SETTINGS
-  // -------------------------
-
-  async updateCommission(value: string) {
+  async updateCommission(value: number) {
     return adminRepository.updateCommission(value);
   }
 

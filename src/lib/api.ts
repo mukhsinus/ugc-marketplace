@@ -1,25 +1,21 @@
 // src/lib/api.ts
 
-import { supabase } from "@/lib/supabase";
-
 const API_BASE_URL =
   import.meta.env.VITE_API_URL || "http://localhost:4000/api/v1";
+
+const TOKEN_KEY = "ugc_token";
 
 async function request(
   path: string,
   options: RequestInit = {}
 ) {
 
-  const {
-    data: { session }
-  } = await supabase.auth.getSession();
-
-  const token = session?.access_token;
+  const token = localStorage.getItem(TOKEN_KEY);
 
   const headers: HeadersInit = {
     "Content-Type": "application/json",
     ...(token ? { Authorization: `Bearer ${token}` } : {}),
-    ...options.headers
+    ...(options.headers || {})
   };
 
   const res = await fetch(`${API_BASE_URL}${path}`, {
@@ -30,11 +26,9 @@ async function request(
   const json = await res.json().catch(() => ({}));
 
   if (!res.ok) {
-
     throw new Error(
-      json.error || `API error: ${res.status}`
+      json?.error || `API error: ${res.status}`
     );
-
   }
 
   return json;

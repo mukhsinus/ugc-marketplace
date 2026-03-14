@@ -1,5 +1,4 @@
 // backend/src/modules/admin/admin.routes.ts
-
 import { FastifyInstance } from "fastify";
 import { authMiddleware } from "../../middleware/auth.middleware";
 import { adminMiddleware } from "../../middleware/admin.middleware";
@@ -19,20 +18,14 @@ import {
 
 export async function adminRoutes(app: FastifyInstance) {
 
-  // -----------------------
   // DASHBOARD
-  // -----------------------
-
   app.get(
     "/dashboard",
     { preHandler: [authMiddleware, adminMiddleware] },
     getDashboard
   );
 
-  // -----------------------
   // USERS
-  // -----------------------
-
   app.get(
     "/users",
     { preHandler: [authMiddleware, adminMiddleware] },
@@ -51,10 +44,7 @@ export async function adminRoutes(app: FastifyInstance) {
     unbanUser
   );
 
-  // -----------------------
   // PAYOUTS
-  // -----------------------
-
   app.get(
     "/payouts",
     { preHandler: [authMiddleware, adminMiddleware] },
@@ -73,10 +63,7 @@ export async function adminRoutes(app: FastifyInstance) {
     rejectPayout
   );
 
-  // -----------------------
   // JOBS
-  // -----------------------
-
   app.get(
     "/jobs",
     { preHandler: [authMiddleware, adminMiddleware] },
@@ -89,10 +76,7 @@ export async function adminRoutes(app: FastifyInstance) {
     deleteJob
   );
 
-  // -----------------------
   // SETTINGS
-  // -----------------------
-
   app.patch(
     "/settings/commission",
     { preHandler: [authMiddleware, adminMiddleware] },

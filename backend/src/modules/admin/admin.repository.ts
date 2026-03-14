@@ -1,5 +1,4 @@
 // backend/src/modules/admin/admin.repository.ts
-
 import { supabaseAdmin } from "../../config/supabase";
 
 export const adminRepository = {
@@ -93,18 +92,13 @@ export const adminRepository = {
   },
 
 
-  // -------------------------------
-  // DASHBOARD DATA
-  // -------------------------------
-
   async getDashboardData() {
 
     const [profilesRes, jobsRes, settingsRes] = await Promise.all([
 
       supabaseAdmin
         .from("profiles")
-        .select("*")
-        .order("created_at", { ascending: false }),
+        .select("*"),
 
       supabaseAdmin
         .from("jobs")
@@ -115,8 +109,7 @@ export const adminRepository = {
             name,
             company_name
           )
-        `)
-        .order("created_at", { ascending: false }),
+        `),
 
       supabaseAdmin
         .from("platform_settings")
@@ -130,19 +123,15 @@ export const adminRepository = {
     if (jobsRes.error) throw jobsRes.error;
 
     return {
-      profiles: profilesRes.data || [],
-      jobs: jobsRes.data || [],
-      commission: settingsRes.data?.value || "15"
+      profiles: profilesRes.data ?? [],
+      jobs: jobsRes.data ?? [],
+      commission: settingsRes.data?.value ?? "15"
     };
 
   },
 
 
-  // -------------------------------
-  // PLATFORM SETTINGS
-  // -------------------------------
-
-  async updateCommission(value: string) {
+  async updateCommission(value: number) {
 
     const { data, error } = await supabaseAdmin
       .from("platform_settings")

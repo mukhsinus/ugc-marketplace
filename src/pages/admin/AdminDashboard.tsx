@@ -13,10 +13,29 @@ import { Users, Briefcase, TrendingUp, Ban, Trash2, Settings } from "lucide-reac
 import { toast } from "sonner";
 import { api } from "@/lib/api";
 
+type User = {
+  id: string;
+  name?: string;
+  company_name?: string;
+  email?: string;
+  role: string;
+  city?: string;
+  is_banned: boolean;
+};
+
+type Job = {
+  id: string;
+  title: string;
+  brandName?: string;
+  status: string;
+  budget_min?: number;
+  budget_max?: number;
+};
+
 const AdminDashboard = () => {
 
-  const [users, setUsers] = useState<any[]>([]);
-  const [jobs, setJobs] = useState<any[]>([]);
+  const [users, setUsers] = useState<User[]>([]);
+  const [jobs, setJobs] = useState<Job[]>([]);
   const [commission, setCommission] = useState("15");
 
   const [stats, setStats] = useState({
@@ -32,22 +51,22 @@ const AdminDashboard = () => {
 
       const res = await api.get("/admin/dashboard");
 
-      const data = res.data ?? res;
+      const data = res?.data ?? res ?? {};
 
-      setUsers(data.users || []);
-      setJobs(data.jobs || []);
-      setCommission(data.commission || "15");
+      setUsers(data.users ?? []);
+      setJobs(data.jobs ?? []);
+      setCommission(String(data.commission ?? "15"));
 
       setStats({
-        creators: data.creators || 0,
-        brands: data.brands || 0,
-        jobs: data.jobsCount || 0,
-        completedJobs: data.completedJobs || 0
+        creators: data.creators ?? 0,
+        brands: data.brands ?? 0,
+        jobs: data.jobsCount ?? 0,
+        completedJobs: data.completedJobs ?? 0
       });
 
     } catch (err) {
 
-      console.error(err);
+      console.error("Admin load error:", err);
       toast.error("Failed to load admin data");
 
     }
@@ -101,7 +120,7 @@ const AdminDashboard = () => {
     try {
 
       await api.patch("/admin/settings/commission", {
-        value: commission
+        value: Number(commission)
       });
 
       toast.success("Commission updated");
@@ -208,7 +227,9 @@ const AdminDashboard = () => {
                         {user.name || user.company_name || "—"}
                       </TableCell>
 
-                      <TableCell>{user.email}</TableCell>
+                      <TableCell>
+                        {user.email || "—"}
+                      </TableCell>
 
                       <TableCell>
                         <Badge variant="secondary" className="capitalize">
@@ -216,7 +237,9 @@ const AdminDashboard = () => {
                         </Badge>
                       </TableCell>
 
-                      <TableCell>{user.city || "—"}</TableCell>
+                      <TableCell>
+                        {user.city || "—"}
+                      </TableCell>
 
                       <TableCell>
                         {user.is_banned
@@ -226,6 +249,7 @@ const AdminDashboard = () => {
                       </TableCell>
 
                       <TableCell>
+
                         <Button
                           variant="ghost"
                           size="sm"
@@ -233,6 +257,7 @@ const AdminDashboard = () => {
                         >
                           <Ban className="w-4 h-4" />
                         </Button>
+
                       </TableCell>
 
                     </TableRow>
@@ -290,6 +315,7 @@ const AdminDashboard = () => {
                       </TableCell>
 
                       <TableCell>
+
                         <Button
                           variant="ghost"
                           size="sm"
@@ -297,6 +323,7 @@ const AdminDashboard = () => {
                         >
                           <Trash2 className="w-4 h-4 text-destructive" />
                         </Button>
+
                       </TableCell>
 
                     </TableRow>
@@ -329,6 +356,7 @@ const AdminDashboard = () => {
               <div className="max-w-sm space-y-4">
 
                 <div>
+
                   <Label htmlFor="commission">
                     Platform Commission (%)
                   </Label>
