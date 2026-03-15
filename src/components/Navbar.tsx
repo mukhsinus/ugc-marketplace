@@ -53,7 +53,7 @@ const Navbar = () => {
           </span>
         </Link>
 
-        {/* Desktop */}
+        {/* Desktop */} 
         <div className="hidden md:flex items-center gap-6">
           <Link
             to="/creators"
@@ -104,12 +104,12 @@ const Navbar = () => {
               </Button>
             </DropdownMenuTrigger>
 
-            <DropdownMenuContent align="end">
+            <DropdownMenuContent align="center" className="rounded-2xl w-fit">
               {(["en", "ru", "uz"] as Language[]).map((l) => (
                 <DropdownMenuItem
                   key={l}
                   onClick={() => setLang(l)}
-                  className={lang === l ? "font-semibold" : ""}
+                  className={`rounded-full w-[50px] flex items-center justify-center ${lang === l ? "font-semibold" : ""}`}
                 >
                   {langLabels[l]}
                 </DropdownMenuItem>

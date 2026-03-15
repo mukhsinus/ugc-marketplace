@@ -1,6 +1,7 @@
 // src/pages/Login.tsx
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { Eye, EyeOff } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,14 +9,17 @@ import { Label } from "@/components/ui/label";
 
 import { toast } from "sonner";
 import { useAuth } from "@/lib/auth";
+import { useI18n } from "@/lib/i18n";
 
 const Login = () => {
 
   const { signIn, user } = useAuth();
+  const { t } = useI18n();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const navigate = useNavigate();
 
@@ -40,7 +44,7 @@ const Login = () => {
     e.preventDefault();
 
     if (!email.trim() || !password.trim()) {
-
+t("auth.errors.fillAll")
       toast.error("Please fill in all fields");
       return;
 
@@ -54,16 +58,17 @@ const Login = () => {
 
       if (error) {
 
-        toast.error(error.message || "Login failed");
+        toast.error(error.message || t("auth.errors.loginFailed"));
         return;
 
       }
 
-      toast.success("Logged in successfully");
+      toast.success(t("auth.success.loggedIn"));
 
-    } catch (err: any) {
+    } catch (err: unknown) {
 
-      toast.error(err.message || "Login failed");
+      const errorMessage = err instanceof Error ? err.message : t("auth.errors.loginFailed");
+      toast.error(errorMessage);
 
     } finally {
 
@@ -83,29 +88,24 @@ const Login = () => {
 
       <div className="w-full max-w-md">
 
-        <Link
-          to="/"
-          className="flex items-center gap-2 justify-center mb-8"
-        >
+        <Link to="/" className="flex items-center gap-2 mx-auto mb-4 justify-center">
+          <img src="/assets/logo.webp" alt="UGC Market" className="h-9 w-auto" />
 
-          <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
-
-            <span className="font-display font-bold text-primary-foreground text-sm">
-              U
+          <span className="text-lg font-bold tracking-tight uppercase flex items-center">
+            <span className="bg-gradient-to-r from-pink-500 via-fuchsia-500 to-purple-600 bg-clip-text text-transparent">
+              UGC
             </span>
 
-          </div>
-
-          <span className="font-display font-bold text-lg text-primary-foreground">
-            UGC Market
+            <span className="ml-1 text-white">
+              Marketplace
+            </span>
           </span>
-
         </Link>
 
         <div className="rounded-2xl bg-background p-8 border border-border shadow-xl">
 
           <h1 className="text-2xl font-bold mb-6 text-center">
-            Welcome Back
+            {t("auth.login.title")}
           </h1>
 
           <form
@@ -116,7 +116,7 @@ const Login = () => {
             <div>
 
               <Label htmlFor="email">
-                Email
+                {t("auth.email")}
               </Label>
 
               <Input
@@ -125,7 +125,7 @@ const Login = () => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="your@email.com"
-                className="mt-1"
+                className="mt-1 rounded-full"
               />
 
             </div>
@@ -133,17 +133,33 @@ const Login = () => {
             <div>
 
               <Label htmlFor="password">
-                Password
+                {t("auth.password")}
               </Label>
 
-              <Input
-                id="password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••"
-                className="mt-1"
-              />
+              <div className="relative mt-1">
+
+                <Input
+                  id="password"
+                  type={showPassword ? "text" : "password"}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="••••••••"
+                  className="pr-10 rounded-full"
+                />
+
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  {showPassword ? (
+                    <EyeOff className="w-4 h-4" />
+                  ) : (
+                    <Eye className="w-4 h-4" />
+                  )}
+                </button>
+
+              </div>
 
             </div>
 
@@ -153,8 +169,8 @@ const Login = () => {
             >
 
               {loading
-                ? "Signing in..."
-                : "Log In"
+                ? t("auth.login.signing")
+                : t("auth.login.button")
               }
 
             </Button>
@@ -163,13 +179,13 @@ const Login = () => {
 
           <p className="text-center text-sm text-muted-foreground mt-6">
 
-            Don't have an account?{" "}
+            {t("auth.login.noAccount")}{" "}
 
             <Link
               to="/signup"
               className="text-primary font-medium hover:underline"
             >
-              Sign Up
+              {t("auth.login.signUp")}
             </Link>
 
           </p>

@@ -9,19 +9,27 @@ const Footer = () => {
     <footer className="bg-surface border-t border-border">
       <div className="container mx-auto px-4 pb-6 pt-12">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-          
           {/* Brand block (always visible) */}
           <div className="md:col-span-2">
-            <div className="flex items-center gap-2 mb-4">
-              <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
-                <span className="font-display font-bold text-primary-foreground text-sm">
-                  U
+            <Link to="/" className="flex items-center gap-2">
+              <img
+                src="/assets/logo.webp"
+                alt="UGC Market"
+                className="h-9 w-auto"
+              />
+
+              <span className="text-lg font-bold tracking-tight uppercase flex items-center">
+                <span className="bg-gradient-to-r from-pink-500 via-fuchsia-500 to-purple-600 bg-clip-text text-transparent">
+                  UGC
                 </span>
-              </div>
-              <span className="font-display font-bold text-lg">
-                UGC Market
+
+                <span
+                  className="ml-1"
+                >
+                  Marketplace
+                </span>
               </span>
-            </div>
+            </Link>
 
             <p className="text-muted-foreground text-sm max-w-md">
               {t("footer.description")}
@@ -94,7 +102,6 @@ const Footer = () => {
               </Link>
             </div>
           </div>
-
         </div>
 
         <div className="border-t border-border mt-8 pt-4 text-center text-sm text-muted-foreground">

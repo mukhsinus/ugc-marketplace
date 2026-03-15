@@ -58,6 +58,28 @@ const translations: Record<string, Record<Language, string>> = {
   "featured.title": { en: "Featured Creators", ru: "Лучшие Креаторы", uz: "Taniqli Kreatorlar" },
   "featured.subtitle": { en: "Top-rated creators ready to bring your brand to life", ru: "Лучшие креаторы, готовые оживить ваш бренд", uz: "Brendingizni jonlantirish uchun tayyor top kreatorlar" },
   "featured.viewall": { en: "View All Creators", ru: "Смотреть Всех", uz: "Barchasini Ko'rish" },
+  // Auth
+  "auth.email": { en: "Email", ru: "Email", uz: "Email" },
+  "auth.password": { en: "Password", ru: "Пароль", uz: "Parol" },
+  "auth.fullName": { en: "Full Name", ru: "Полное имя", uz: "To'liq ism" },
+  "auth.companyName": { en: "Company Name", ru: "Название компании", uz: "Kompaniya nomi" },
+  "auth.login.title": { en: "Welcome Back", ru: "Добро пожаловать", uz: "Xush kelibsiz" },
+  "auth.login.button": { en: "Log In", ru: "Войти", uz: "Kirish" },
+  "auth.login.signing": { en: "Signing in...", ru: "Вход...", uz: "Kirayotgan..." },
+  "auth.login.noAccount": { en: "Don't have an account?", ru: "Нет аккаунта?", uz: "Hisobingiz yo'qmi?" },
+  "auth.login.signUp": { en: "Sign Up", ru: "Зарегистрироваться", uz: "Ro'yxatdan O'tish" },
+  "auth.signup.title": { en: "Create Account", ru: "Создать аккаунт", uz: "Akkaunt Yarating" },
+  "auth.signup.creator": { en: "Creator", ru: "Креатор", uz: "Kreator" },
+  "auth.signup.brand": { en: "Brand", ru: "Бренд", uz: "Brend" },
+  "auth.signup.button": { en: "Create Account", ru: "Создать аккаунт", uz: "Akkaunt Yarating" },
+  "auth.signup.creating": { en: "Creating...", ru: "Создание...", uz: "Yaratilmoqda..." },
+  "auth.signup.haveAccount": { en: "Already have an account?", ru: "Уже есть аккаунт?", uz: "Allaqachon hisobingiz bormi?" },
+  "auth.errors.fillAll": { en: "Please fill in all fields", ru: "Пожалуйста, заполните все поля", uz: "Iltimos, barcha maydonlarni to'ldiring" },
+  "auth.errors.passwordMin": { en: "Password must be at least 6 characters", ru: "Пароль должен содержать минимум 6 символов", uz: "Parol kamida 6 ta belgi bo'lishi kerak" },
+  "auth.errors.loginFailed": { en: "Login failed", ru: "Ошибка входа", uz: "Kirishda xato" },
+  "auth.errors.signupFailed": { en: "Signup failed", ru: "Ошибка регистрации", uz: "Ro'yxatdan o'tishda xato" },
+  "auth.success.loggedIn": { en: "Logged in successfully", ru: "Успешно вошли", uz: "Muvaffaqiyatli kirdingiz" },
+  "auth.success.accountCreated": { en: "Account created", ru: "Аккаунт создан", uz: "Akkaunt yaratildi" },
 };
 
 type I18nContextType = {
