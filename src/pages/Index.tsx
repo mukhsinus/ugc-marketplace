@@ -1,3 +1,4 @@
+// src/pages/Index.tsx
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import HeroSection from "@/components/landing/HeroSection";
@@ -8,14 +9,22 @@ import CTASection from "@/components/landing/CTASection";
 
 const Index = () => {
   return (
-    <div className="min-h-screen">
+    <div className="flex flex-col min-h-screen">
+
       <Navbar />
-      <HeroSection />
-      <HowItWorks />
-      <BenefitsSection />
-      <FeaturedCreators />
-      <CTASection />
+
+      <main className="flex-1">
+
+        <HeroSection />
+        <HowItWorks />
+        <BenefitsSection />
+        <FeaturedCreators />
+        <CTASection />
+
+      </main>
+
       <Footer />
+
     </div>
   );
 };
