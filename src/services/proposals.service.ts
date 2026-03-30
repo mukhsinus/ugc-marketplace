@@ -2,11 +2,11 @@
 // ugc-marketplace/src/services/proposals.service.ts
 
 import { api } from "@/lib/api";
-import { Proposal } from "@/types/proposal";
+import type { ProposalResponse, ProposalDetailResponse } from "@/types/api-responses";
 
 export const proposalsService = {
 
-  async getJobProposals(jobId: string): Promise<Proposal[]> {
+  async getJobProposals(jobId: string): Promise<ProposalDetailResponse[]> {
     const response = await api.get(`/proposals/job/${jobId}`);
     return response.data;
   },
@@ -18,7 +18,7 @@ export const proposalsService = {
       price_offer?: number;
       delivery_time?: number;
     }
-  ): Promise<Proposal> {
+  ): Promise<ProposalDetailResponse> {
     const response = await api.post(`/proposals/${jobId}`, data);
     return response.data;
   },
@@ -26,7 +26,7 @@ export const proposalsService = {
   async updateProposalStatus(
     proposalId: string,
     status: "accepted" | "rejected"
-  ): Promise<Proposal> {
+  ): Promise<ProposalDetailResponse> {
     const response = await api.patch(`/proposals/${proposalId}`, {
       status,
     });

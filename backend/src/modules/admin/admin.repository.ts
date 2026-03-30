@@ -94,7 +94,7 @@ export const adminRepository = {
 
   async getDashboardData() {
 
-    const [profilesRes, jobsRes, settingsRes] = await Promise.all([
+    const [profilesRes, jobsRes, payoutsRes, settingsRes] = await Promise.all([
 
       supabaseAdmin
         .from("profiles")
@@ -112,6 +112,18 @@ export const adminRepository = {
         `),
 
       supabaseAdmin
+        .from("payouts")
+        .select(`
+          *,
+          profiles:user_id (
+            id,
+            email,
+            role
+          )
+        `)
+        .order("created_at", { ascending: false }),
+
+      supabaseAdmin
         .from("platform_settings")
         .select("*")
         .eq("key", "commission_rate")
@@ -121,10 +133,12 @@ export const adminRepository = {
 
     if (profilesRes.error) throw profilesRes.error;
     if (jobsRes.error) throw jobsRes.error;
+    if (payoutsRes.error) throw payoutsRes.error;
 
     return {
       profiles: profilesRes.data ?? [],
       jobs: jobsRes.data ?? [],
+      payouts: payoutsRes.data ?? [],
       commission: settingsRes.data?.value ?? "15"
     };
 

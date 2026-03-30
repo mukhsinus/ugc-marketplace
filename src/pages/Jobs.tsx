@@ -6,6 +6,7 @@ import { Briefcase, Calendar, DollarSign, Video } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Link } from "react-router-dom";
 import { useJobs } from "@/hooks/useJobs";
+import { useI18n } from "@/lib/i18n";
 
 const statusColors: Record<string, string> = {
   open: "bg-green-100 text-green-700",
@@ -15,6 +16,7 @@ const statusColors: Record<string, string> = {
 };
 
 const Jobs = () => {
+  const { t } = useI18n();
   const { data: jobs, isLoading } = useJobs();
 
   return (
@@ -24,16 +26,16 @@ const Jobs = () => {
       <div className="container mx-auto px-4 pt-24 pb-16">
 
         <h1 className="text-3xl md:text-4xl font-bold mb-2">
-          Job Board
+          {t("jobs.title")}
         </h1>
 
         <p className="text-muted-foreground mb-8">
-          Browse UGC campaigns from top brands
+          {t("jobs.subtitle")}
         </p>
 
         {isLoading && (
           <p className="text-center py-16 text-muted-foreground">
-            Loading jobs...
+            {t("jobs.loading")}
           </p>
         )}
 
@@ -57,13 +59,13 @@ const Jobs = () => {
                       <span
                         className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${statusColors[job.status]}`}
                       >
-                        {job.status}
+                        {t(`jobs.status.${job.status}`)}
                       </span>
 
                     </div>
 
                     <p className="text-sm text-muted-foreground mb-3">
-                      {job.brand?.company_name || job.brand?.name || "Brand"}
+                      {job.brand?.company_name || job.brand?.name || t("jobs.brand.default")}
                     </p>
 
                     <div className="flex flex-wrap gap-4 text-sm text-muted-foreground">
@@ -85,7 +87,7 @@ const Jobs = () => {
                       {job.videos_required && (
                         <span className="flex items-center gap-1">
                           <Briefcase className="w-4 h-4" />
-                          {job.videos_required} videos
+                          {job.videos_required} {t("jobs.videos")}
                         </span>
                       )}
 
@@ -117,7 +119,7 @@ const Jobs = () => {
 
         {!isLoading && (!jobs || jobs.length === 0) && (
           <p className="text-center text-muted-foreground py-16">
-            No open jobs at the moment. Check back later!
+            {t("jobs.nodata")}
           </p>
         )}
 

@@ -14,6 +14,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { api } from "@/lib/api";
+import { useI18n } from "@/lib/i18n";
 
 type LibraryItem = {
   id: string;
@@ -26,6 +27,18 @@ type LibraryItem = {
 };
 
 const categories = [
+  "library.category.all",
+  "library.category.beauty",
+  "library.category.fashion",
+  "library.category.food",
+  "library.category.tech",
+  "library.category.lifestyle",
+  "library.category.fitness",
+  "library.category.education",
+  "library.category.travel",
+];
+
+const categoryValues = [
   "All",
   "beauty",
   "fashion",
@@ -38,7 +51,7 @@ const categories = [
 ];
 
 const Library = () => {
-
+  const { t } = useI18n();
   const [items, setItems] = useState<LibraryItem[]>([]);
   const [category, setCategory] = useState("All");
   const [loading, setLoading] = useState(true);
@@ -87,11 +100,11 @@ const Library = () => {
 
           <div>
             <h1 className="text-3xl md:text-4xl font-bold mb-2">
-              Content Library
+              {t("library.title")}
             </h1>
 
             <p className="text-muted-foreground">
-              Browse and purchase ready-made UGC videos
+              {t("library.subtitle")}
             </p>
           </div>
 
@@ -101,9 +114,9 @@ const Library = () => {
             </SelectTrigger>
 
             <SelectContent>
-              {categories.map((c) => (
-                <SelectItem key={c} value={c} className="capitalize">
-                  {c}
+              {categories.map((cat, idx) => (
+                <SelectItem key={cat} value={categoryValues[idx]} className="capitalize">
+                  {t(cat)}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -114,7 +127,7 @@ const Library = () => {
         {loading ? (
 
           <div className="text-center py-16 text-muted-foreground">
-            Loading content...
+            {t("library.loading")}
           </div>
 
         ) : (
@@ -148,7 +161,7 @@ const Library = () => {
                   </h3>
 
                   <p className="text-sm text-muted-foreground mb-3">
-                    by {item.creatorName ?? "Creator"}
+                    by {item.creatorName ?? t("library.creator.default")}
                   </p>
 
                   <div className="flex items-center justify-between">
@@ -177,7 +190,7 @@ const Library = () => {
 
                   <Button className="w-full mt-4 gap-2" size="sm">
                     <ShoppingCart className="w-4 h-4" />
-                    Purchase
+                    {t("library.purchase")}
                   </Button>
 
                 </div>
@@ -192,7 +205,7 @@ const Library = () => {
 
         {!loading && items.length === 0 && (
           <p className="text-center text-muted-foreground py-16">
-            No content available yet.
+            {t("library.nodata")}
           </p>
         )}
 

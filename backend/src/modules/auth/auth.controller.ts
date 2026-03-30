@@ -2,6 +2,7 @@
 
 import { FastifyRequest, FastifyReply } from "fastify";
 import { authService } from "./auth.service";
+import type { LoginResponse, CurrentUserResponse } from "../../types/responses";
 
 
 // ------------------------------------
@@ -16,13 +17,13 @@ export async function login(
     };
   }>,
   reply: FastifyReply
-) {
+): Promise<void> {
 
   try {
 
     const { email, password } = request.body;
 
-    const result = await authService.login(email, password);
+    const result: LoginResponse = await authService.login(email, password);
 
     return reply.send({
       data: result,
@@ -57,13 +58,13 @@ export async function signup(
     };
   }>,
   reply: FastifyReply
-) {
+): Promise<void> {
 
   try {
 
     const { email, password, role, name } = request.body;
 
-    const result = await authService.signup(
+    const result: LoginResponse = await authService.signup(
       email,
       password,
       role,
@@ -96,7 +97,7 @@ export async function signup(
 export async function getCurrentUser(
   request: FastifyRequest,
   reply: FastifyReply
-) {
+): Promise<void> {
 
   try {
 
@@ -109,7 +110,7 @@ export async function getCurrentUser(
       });
     }
 
-    const profile = await authService.getCurrentUser(userId);
+    const profile: CurrentUserResponse = await authService.getCurrentUser(userId);
 
     return reply.send({
       data: profile,
@@ -137,7 +138,7 @@ export async function getCurrentUser(
 export async function logout(
   request: FastifyRequest,
   reply: FastifyReply
-) {
+): Promise<void> {
 
   try {
 

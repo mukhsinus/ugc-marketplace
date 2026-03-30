@@ -1,11 +1,11 @@
 // src/services/jobs.service.ts
 
 import { api } from "@/lib/api";
-import { Job } from "@/types/job";
+import type { JobResponse, JobDetailResponse } from "@/types/api-responses";
 
 export const jobsService = {
 
-  async getJobs(): Promise<Job[]> {
+  async getJobs(): Promise<JobResponse[]> {
 
     const response = await api.get("/jobs");
 
@@ -17,7 +17,7 @@ export const jobsService = {
 
   },
 
-  async getJobById(jobId: string): Promise<Job> {
+  async getJobById(jobId: string): Promise<JobDetailResponse> {
 
     const response = await api.get(`/jobs/${jobId}`);
 
@@ -29,7 +29,7 @@ export const jobsService = {
 
   },
 
-  async createJob(data: Partial<Job>): Promise<Job> {
+  async createJob(data: Partial<JobResponse>): Promise<JobDetailResponse> {
 
     const response = await api.post("/jobs", data);
 
@@ -37,7 +37,7 @@ export const jobsService = {
 
   },
 
-  async updateJob(jobId: string, data: Partial<Job>): Promise<Job> {
+  async updateJob(jobId: string, data: Partial<JobResponse>): Promise<JobDetailResponse> {
 
     const response = await api.patch(`/jobs/${jobId}`, data);
 

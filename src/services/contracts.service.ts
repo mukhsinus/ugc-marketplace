@@ -1,11 +1,11 @@
 // ugc-marketplace/src/services/contracts.service.ts
 
 import { api } from "@/lib/api";
-import { Contract } from "@/types/contract";
+import type { ContractResponse, ContractDetailResponse } from "@/types/api-responses";
 
 export const contractsService = {
 
-  async getContractByJob(jobId: string): Promise<Contract | null> {
+  async getContractByJob(jobId: string): Promise<ContractDetailResponse | null> {
     const response = await api.get(`/contracts/job/${jobId}`);
     return response.data;
   },
@@ -16,7 +16,7 @@ export const contractsService = {
     creator_id: string;
     amount: number;
     currency: string;
-  }): Promise<Contract> {
+  }): Promise<ContractDetailResponse> {
     const response = await api.post("/contracts", data);
     return response.data;
   },

@@ -52,7 +52,8 @@ export async function registerWebsocket(app: FastifyInstance) {
 
           }
 
-        } catch {
+        } catch (err) {
+          console.error("WebSocket message parse error:", err);
           return;
         }
 
@@ -88,8 +89,9 @@ export async function registerWebsocket(app: FastifyInstance) {
           })
         );
 
-      } catch {
+      } catch (err) {
 
+        console.error("Failed to broadcast message:", err);
         socket.close();
 
       }
@@ -115,8 +117,9 @@ export async function registerWebsocket(app: FastifyInstance) {
           })
         );
 
-      } catch {
+      } catch (err) {
 
+        console.error("Failed to broadcast message seen:", err);
         socket.close();
 
       }
@@ -142,8 +145,9 @@ export async function registerWebsocket(app: FastifyInstance) {
           })
         );
 
-      } catch {
+      } catch (err) {
 
+        console.error("Failed to broadcast message deleted:", err);
         socket.close();
 
       }

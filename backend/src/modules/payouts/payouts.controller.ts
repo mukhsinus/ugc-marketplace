@@ -5,11 +5,12 @@ import {
   createPayoutSchema,
   updatePayoutStatusSchema
 } from "./payouts.schema";
+import type { PayoutResponse, PayoutDetailResponse } from "../../types/responses";
 
 export async function createPayout(
   request: FastifyRequest,
   reply: FastifyReply
-) {
+): Promise<void> {
 
   const parsed = createPayoutSchema.safeParse(request.body);
 
@@ -17,7 +18,7 @@ export async function createPayout(
     return reply.status(400).send(parsed.error);
   }
 
-  const payout = await payoutsService.createPayout(
+  const payout: PayoutDetailResponse = await payoutsService.createPayout(
     request.user!.id,
     parsed.data
   );
@@ -28,9 +29,9 @@ export async function createPayout(
 export async function getMyPayouts(
   request: FastifyRequest,
   reply: FastifyReply
-) {
+): Promise<void> {
 
-  const payouts = await payoutsService.getUserPayouts(
+  const payouts: PayoutDetailResponse[] = await payoutsService.getUserPayouts(
     request.user!.id
   );
 
@@ -40,7 +41,7 @@ export async function getMyPayouts(
 export async function updatePayoutStatus(
   request: FastifyRequest<{ Params: { id: string } }>,
   reply: FastifyReply
-) {
+): Promise<void> {
 
   const parsed = updatePayoutStatusSchema.safeParse(request.body);
 
@@ -48,7 +49,7 @@ export async function updatePayoutStatus(
     return reply.status(400).send(parsed.error);
   }
 
-  const payout = await payoutsService.updatePayoutStatus(
+  const payout: PayoutDetailResponse = await payoutsService.updatePayoutStatus(
     request.params.id,
     parsed.data.status,
     parsed.data.external_reference

@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Users, Briefcase, TrendingUp, Ban, Trash2, Settings } from "lucide-react";
+import { Users, Briefcase, TrendingUp, Ban, Trash2, Settings, CheckCircle2, XCircle } from "lucide-react";
 import { toast } from "sonner";
 import { api } from "@/lib/api";
 
@@ -32,10 +32,24 @@ type Job = {
   budget_max?: number;
 };
 
+type Payout = {
+  id: string;
+  user_id: string;
+  amount: number;
+  status: "pending" | "paid" | "rejected";
+  created_at?: string;
+  profiles?: {
+    id: string;
+    email?: string;
+    role?: string;
+  };
+};
+
 const AdminDashboard = () => {
 
   const [users, setUsers] = useState<User[]>([]);
   const [jobs, setJobs] = useState<Job[]>([]);
+  const [payouts, setPayouts] = useState<Payout[]>([]);
   const [commission, setCommission] = useState("15");
 
   const [stats, setStats] = useState({
@@ -55,6 +69,7 @@ const AdminDashboard = () => {
 
       setUsers(data.users ?? []);
       setJobs(data.jobs ?? []);
+      setPayouts(data.payouts ?? []);
       setCommission(String(data.commission ?? "15"));
 
       setStats({
@@ -110,6 +125,42 @@ const AdminDashboard = () => {
     } catch {
 
       toast.error("Failed to delete job");
+
+    }
+
+  };
+
+  const approvePayout = async (payoutId: string) => {
+
+    try {
+
+      await api.patch(`/admin/payouts/${payoutId}/approve`);
+
+      toast.success("Payout approved");
+
+      loadData();
+
+    } catch {
+
+      toast.error("Failed to approve payout");
+
+    }
+
+  };
+
+  const rejectPayout = async (payoutId: string) => {
+
+    try {
+
+      await api.patch(`/admin/payouts/${payoutId}/reject`);
+
+      toast.success("Payout rejected");
+
+      loadData();
+
+    } catch {
+
+      toast.error("Failed to reject payout");
 
     }
 
@@ -195,6 +246,7 @@ const AdminDashboard = () => {
         <TabsList className="mb-6">
           <TabsTrigger value="users">Users</TabsTrigger>
           <TabsTrigger value="jobs">Jobs</TabsTrigger>
+          <TabsTrigger value="payouts">Payouts</TabsTrigger>
           <TabsTrigger value="settings">Settings</TabsTrigger>
         </TabsList>
 
@@ -334,6 +386,86 @@ const AdminDashboard = () => {
 
               </Table>
 
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* PAYOUTS */}
+
+        <TabsContent value="payouts">
+          <Card>
+            <CardContent className="pt-6">
+              {payouts.length === 0 ? (
+                <div className="text-center text-muted-foreground py-8">
+                  No payouts found
+                </div>
+              ) : (
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>User Email</TableHead>
+                      <TableHead>Amount</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead>Date</TableHead>
+                      <TableHead>Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {payouts.map((payout) => (
+                      <TableRow key={payout.id}>
+                        <TableCell>
+                          {payout.profiles?.email || "—"}
+                        </TableCell>
+                        <TableCell>
+                          ${payout.amount.toFixed(2)}
+                        </TableCell>
+                        <TableCell>
+                          <Badge 
+                            variant={
+                              payout.status === "paid" 
+                                ? "default" 
+                                : payout.status === "rejected"
+                                ? "destructive"
+                                : "secondary"
+                            }
+                            className="capitalize"
+                          >
+                            {payout.status}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>
+                          {payout.created_at
+                            ? new Date(payout.created_at).toLocaleDateString()
+                            : "—"
+                          }
+                        </TableCell>
+                        <TableCell className="flex gap-2">
+                          {payout.status === "pending" && (
+                            <>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => approvePayout(payout.id)}
+                                className="text-green-600 hover:text-green-700"
+                              >
+                                <CheckCircle2 className="w-4 h-4" />
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => rejectPayout(payout.id)}
+                                className="text-red-600 hover:text-red-700"
+                              >
+                                <XCircle className="w-4 h-4" />
+                              </Button>
+                            </>
+                          )}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              )}
             </CardContent>
           </Card>
         </TabsContent>

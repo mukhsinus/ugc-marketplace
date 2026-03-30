@@ -17,6 +17,48 @@ class PortfolioRepository {
 
   }
 
+  async createPortfolioItem(userId: string, item: any) {
+
+    const { data, error } = await supabaseAdmin
+      .from("portfolio")
+      .insert([{ ...item, creator_id: userId }])
+      .select()
+      .single();
+
+    if (error) throw error;
+
+    return data;
+
+  }
+
+  async updatePortfolioItem(itemId: string, updates: any) {
+
+    const { data, error } = await supabaseAdmin
+      .from("portfolio")
+      .update(updates)
+      .eq("id", itemId)
+      .select()
+      .single();
+
+    if (error) throw error;
+
+    return data;
+
+  }
+
+  async deletePortfolioItem(itemId: string) {
+
+    const { error } = await supabaseAdmin
+      .from("portfolio")
+      .delete()
+      .eq("id", itemId);
+
+    if (error) throw error;
+
+    return true;
+
+  }
+
 }
 
 export const portfolioRepository = new PortfolioRepository();

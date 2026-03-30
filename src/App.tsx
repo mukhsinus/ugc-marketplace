@@ -2,6 +2,7 @@
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 
 import { QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
@@ -32,151 +33,158 @@ import DashboardJobs from "./pages/dashboard/DashboardJobs";
 
 import AdminDashboard from "./pages/admin/AdminDashboard";
 
+import Banned from "./pages/Banned";
 import NotFound from "./pages/NotFound";
 
 const App = () => (
 
-  <QueryClientProvider client={queryClient}>
+  <ErrorBoundary>
+    <QueryClientProvider client={queryClient}>
 
-    <I18nProvider>
+      <I18nProvider>
 
-      <BrowserRouter>
+        <BrowserRouter>
 
-        <AuthProvider>
+          <AuthProvider>
 
-          <TooltipProvider>
+            <TooltipProvider>
 
-            <Toaster />
-            <Sonner />
+              <Toaster />
+              <Sonner />
 
-            <Routes>
+              <Routes>
 
-              {/* PUBLIC */}
+                {/* PUBLIC */}
 
-              <Route path="/" element={<Index />} />
+                <Route path="/" element={<Index />} />
 
-              <Route path="/creators" element={<Creators />} />
-              <Route path="/jobs" element={<Jobs />} />
-              <Route path="/jobs/:jobId" element={<JobDetail />} />
-              <Route path="/library" element={<Library />} />
+                <Route path="/creators" element={<Creators />} />
+                <Route path="/jobs" element={<Jobs />} />
+                <Route path="/jobs/:jobId" element={<JobDetail />} />
+                <Route path="/library" element={<Library />} />
 
-              <Route path="/login" element={<Login />} />
-              <Route path="/signup" element={<Signup />} />
+                <Route path="/login" element={<Login />} />
+                <Route path="/signup" element={<Signup />} />
 
-              {/* DASHBOARD ROOT */}
+                {/* DASHBOARD ROOT */}
 
-              <Route
-                path="/dashboard"
-                element={
-                  <ProtectedRoute>
-                    <Dashboard />
-                  </ProtectedRoute>
-                }
-              />
+                <Route
+                  path="/dashboard"
+                  element={
+                    <ProtectedRoute>
+                      <Dashboard />
+                    </ProtectedRoute>
+                  }
+                />
 
-              {/* SHARED DASHBOARD */}
+                {/* SHARED DASHBOARD */}
 
-              <Route
-                path="/dashboard/jobs"
-                element={
-                  <ProtectedRoute>
-                    <DashboardJobs />
-                  </ProtectedRoute>
-                }
-              />
+                <Route
+                  path="/dashboard/jobs"
+                  element={
+                    <ProtectedRoute>
+                      <DashboardJobs />
+                    </ProtectedRoute>
+                  }
+                />
 
-              <Route
-                path="/dashboard/profile"
-                element={
-                  <ProtectedRoute>
-                    <ProfilePage />
-                  </ProtectedRoute>
-                }
-              />
+                <Route
+                  path="/dashboard/profile"
+                  element={
+                    <ProtectedRoute>
+                      <ProfilePage />
+                    </ProtectedRoute>
+                  }
+                />
 
-              <Route
-                path="/dashboard/messages"
-                element={
-                  <ProtectedRoute>
-                    <MessagesList />
-                  </ProtectedRoute>
-                }
-              />
+                <Route
+                  path="/dashboard/messages"
+                  element={
+                    <ProtectedRoute>
+                      <MessagesList />
+                    </ProtectedRoute>
+                  }
+                />
 
-              <Route
-                path="/dashboard/messages/:jobId"
-                element={
-                  <ProtectedRoute>
-                    <JobMessages />
-                  </ProtectedRoute>
-                }
-              />
+                <Route
+                  path="/dashboard/messages/:jobId"
+                  element={
+                    <ProtectedRoute>
+                      <JobMessages />
+                    </ProtectedRoute>
+                  }
+                />
 
-              {/* BRAND */}
+                {/* BRAND */}
 
-              <Route
-                path="/dashboard/my-jobs"
-                element={
-                  <ProtectedRoute>
-                    <RoleGuard allowedRoles={["brand"]}>
-                      <BrandJobs />
-                    </RoleGuard>
-                  </ProtectedRoute>
-                }
-              />
+                <Route
+                  path="/dashboard/my-jobs"
+                  element={
+                    <ProtectedRoute>
+                      <RoleGuard allowedRoles={["brand"]}>
+                        <BrandJobs />
+                      </RoleGuard>
+                    </ProtectedRoute>
+                  }
+                />
 
-              {/* CREATOR */}
+                {/* CREATOR */}
 
-              <Route
-                path="/dashboard/portfolio"
-                element={
-                  <ProtectedRoute>
-                    <RoleGuard allowedRoles={["creator"]}>
-                      <Portfolio />
-                    </RoleGuard>
-                  </ProtectedRoute>
-                }
-              />
+                <Route
+                  path="/dashboard/portfolio"
+                  element={
+                    <ProtectedRoute>
+                      <RoleGuard allowedRoles={["creator"]}>
+                        <Portfolio />
+                      </RoleGuard>
+                    </ProtectedRoute>
+                  }
+                />
 
-              <Route
-                path="/dashboard/my-content"
-                element={
-                  <ProtectedRoute>
-                    <RoleGuard allowedRoles={["creator"]}>
-                      <MyContent />
-                    </RoleGuard>
-                  </ProtectedRoute>
-                }
-              />
+                <Route
+                  path="/dashboard/my-content"
+                  element={
+                    <ProtectedRoute>
+                      <RoleGuard allowedRoles={["creator"]}>
+                        <MyContent />
+                      </RoleGuard>
+                    </ProtectedRoute>
+                  }
+                />
 
-              {/* ADMIN */}
+                {/* ADMIN */}
 
-              <Route
-                path="/admin"
-                element={
-                  <ProtectedRoute>
-                    <RoleGuard allowedRoles={["admin"]}>
-                      <AdminDashboard />
-                    </RoleGuard>
-                  </ProtectedRoute>
-                }
-              />
+                <Route
+                  path="/admin"
+                  element={
+                    <ProtectedRoute>
+                      <RoleGuard allowedRoles={["admin"]}>
+                        <AdminDashboard />
+                      </RoleGuard>
+                    </ProtectedRoute>
+                  }
+                />
 
-              {/* 404 */}
+                {/* BANNED STATUS PAGE */}
 
-              <Route path="*" element={<NotFound />} />
+                <Route path="/banned" element={<Banned />} />
 
-            </Routes>
+                {/* 404 */}
 
-          </TooltipProvider>
+                <Route path="*" element={<NotFound />} />
 
-        </AuthProvider>
+              </Routes>
 
-      </BrowserRouter>
+            </TooltipProvider>
 
-    </I18nProvider>
+          </AuthProvider>
 
-  </QueryClientProvider>
+        </BrowserRouter>
+
+      </I18nProvider>
+
+    </QueryClientProvider>
+  </ErrorBoundary>
 
 );
 

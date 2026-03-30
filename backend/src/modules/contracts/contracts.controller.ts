@@ -3,11 +3,12 @@
 
 import { FastifyRequest, FastifyReply } from "fastify";
 import { contractsService } from "./contracts.service";
+import type { ContractResponse, ContractDetailResponse, EscrowResponse, EscrowActionResponse } from "../../types/responses";
 
 export async function createContract(
   request: FastifyRequest,
   reply: FastifyReply
-) {
+): Promise<void> {
   const { job_id, creator_id, amount, currency } = request.body as any;
 
   const brandId = request.user?.id;
@@ -16,7 +17,7 @@ export async function createContract(
     return reply.status(401).send({ error: "Unauthorized" });
   }
 
-  const contract = await contractsService.createContract(
+  const contract: ContractDetailResponse = await contractsService.createContract(
     job_id,
     brandId,
     creator_id,
@@ -30,8 +31,8 @@ export async function createContract(
 export async function getContractByJob(
   request: FastifyRequest<{ Params: { jobId: string } }>,
   reply: FastifyReply
-) {
-  const contract = await contractsService.getContractByJob(
+): Promise<void> {
+  const contract: ContractDetailResponse | null = await contractsService.getContractByJob(
     request.params.jobId
   );
 
@@ -45,7 +46,7 @@ export async function getContractByJob(
 export async function createEscrow(
   request: FastifyRequest,
   reply: FastifyReply
-) {
+): Promise<void> {
   const {
     contract_id,
     payer_wallet_id,
@@ -54,7 +55,7 @@ export async function createEscrow(
     currency
   } = request.body as any;
 
-  const escrow = await contractsService.createEscrow(
+  const escrow: EscrowResponse = await contractsService.createEscrow(
     contract_id,
     payer_wallet_id,
     payee_wallet_id,
@@ -68,7 +69,7 @@ export async function createEscrow(
 export async function releaseEscrow(
   request: FastifyRequest<{ Params: { contractId: string } }>,
   reply: FastifyReply
-) {
+): Promise<void> {
   await contractsService.releaseEscrow(request.params.contractId);
 
   return reply.send({ success: true });
@@ -77,7 +78,7 @@ export async function releaseEscrow(
 export async function cancelEscrow(
   request: FastifyRequest<{ Params: { contractId: string } }>,
   reply: FastifyReply
-) {
+): Promise<void> {
   await contractsService.cancelEscrow(request.params.contractId);
 
   return reply.send({ success: true });

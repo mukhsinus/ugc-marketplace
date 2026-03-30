@@ -7,6 +7,7 @@ import { registerRoutes } from "./routes";
 import { registerErrorHandler } from "./middleware/error.middleware";
 import { requestLoggerMiddleware } from "./middleware/requestLogger.middleware";
 import { registerSecurityMiddleware } from "./middleware/security.middleware";
+import { rateLimitMiddleware } from "./middleware/rateLimit.middleware";
 import { registerWebsocket } from "./plugins/websocket";
 import { supabaseAdmin } from "./config/supabase";
 
@@ -28,12 +29,26 @@ const fastify = Fastify({
 async function start() {
   try {
 
+    // Configure CORS with restricted origins
+    const corsOrigins = (process.env.CORS_ORIGINS || 'http://localhost:8080').split(',').map(o => o.trim());
+    
     await fastify.register(cors, {
-      origin: true,
-      credentials: true
+      origin: (origin, callback) => {
+        // Allow requests with no origin (like mobile apps)
+        if (!origin || corsOrigins.includes(origin)) {
+          callback(null, true);
+        } else {
+          callback(null, false);
+        }
+      },
+      credentials: true,
+      methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+      allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
     });
 
     fastify.addHook("onRequest", requestLoggerMiddleware);
+
+    fastify.addHook("onRequest", rateLimitMiddleware);
 
     await registerSecurityMiddleware(fastify);
 

@@ -13,6 +13,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { api } from "@/lib/api";
+import { useI18n } from "@/lib/i18n";
 
 type Creator = {
   id: string;
@@ -26,6 +27,18 @@ type Creator = {
 };
 
 const categories = [
+  "creators.category.all",
+  "creators.category.beauty",
+  "creators.category.fashion",
+  "creators.category.food",
+  "creators.category.tech",
+  "creators.category.lifestyle",
+  "creators.category.fitness",
+  "creators.category.education",
+  "creators.category.travel",
+];
+
+const categoryValues = [
   "All",
   "beauty",
   "fashion",
@@ -38,6 +51,16 @@ const categories = [
 ];
 
 const cities = [
+  "creators.city.all",
+  "creators.city.tashkent",
+  "creators.city.samarkand",
+  "creators.city.bukhara",
+  "creators.city.namangan",
+  "creators.city.andijan",
+  "creators.city.fergana",
+];
+
+const cityValues = [
   "All",
   "Tashkent",
   "Samarkand",
@@ -59,6 +82,7 @@ const categoryColors: Record<string, string> = {
 };
 
 const Creators = () => {
+  const { t } = useI18n();
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("All");
   const [city, setCity] = useState("All");
@@ -102,11 +126,11 @@ const Creators = () => {
 
       <div className="container mx-auto px-4 pt-24 pb-16">
         <h1 className="text-3xl md:text-4xl font-bold mb-2">
-          Creator Marketplace
+          {t("creators.title")}
         </h1>
 
         <p className="text-muted-foreground mb-8">
-          Find the perfect UGC creator for your brand
+          {t("creators.subtitle")}
         </p>
 
         {/* Filters */}
@@ -116,7 +140,7 @@ const Creators = () => {
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
 
             <Input
-              placeholder="Search creators..."
+              placeholder={t("creators.search")}
               className="pl-10  rounded-full"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
@@ -129,9 +153,9 @@ const Creators = () => {
             </SelectTrigger>
 
             <SelectContent className="rounded-3xl">
-              {categories.map((c) => (
-                <SelectItem key={c} value={c} className="capitalize rounded-full">
-                  {c}
+              {categories.map((cat, idx) => (
+                <SelectItem key={cat} value={categoryValues[idx]} className="capitalize rounded-full">
+                  {t(cat)}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -143,9 +167,9 @@ const Creators = () => {
             </SelectTrigger>
 
             <SelectContent className="rounded-3xl">
-              {cities.map((c) => (
-                <SelectItem key={c} value={c} className="rounded-full">
-                  {c}
+              {cities.map((c, idx) => (
+                <SelectItem key={c} value={cityValues[idx]} className="rounded-full">
+                  {t(c)}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -157,10 +181,10 @@ const Creators = () => {
             </SelectTrigger>
 
             <SelectContent className="rounded-3xl">
-              <SelectItem value="rating" className="rounded-full">Top Rated</SelectItem>
-              <SelectItem value="price_low" className="rounded-full">Price: Low</SelectItem>
-              <SelectItem value="price_high" className="rounded-full">Price: High</SelectItem>
-              <SelectItem value="new" className="rounded-full">Newest</SelectItem>
+              <SelectItem value="rating" className="rounded-full">{t("creators.sort.toprated")}</SelectItem>
+              <SelectItem value="price_low" className="rounded-full">{t("creators.sort.pricelow")}</SelectItem>
+              <SelectItem value="price_high" className="rounded-full">{t("creators.sort.pricehigh")}</SelectItem>
+              <SelectItem value="new" className="rounded-full">{t("creators.sort.newest")}</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -169,7 +193,7 @@ const Creators = () => {
 
         {loading ? (
           <div className="text-center py-16 text-muted-foreground">
-            Loading creators...
+            {t("creators.loading")}
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -196,7 +220,7 @@ const Creators = () => {
                 </div>
 
                 <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
-                  {creator.bio || "UGC Creator"}
+                  {creator.bio || t("creators.default")}
                 </p>
 
                 <div className="flex flex-wrap gap-1.5 mb-3">
@@ -217,7 +241,7 @@ const Creators = () => {
                     <Star className="w-3.5 h-3.5 fill-yellow-400 text-yellow-400" />
 
                     <span className="font-medium">
-                      {creator.rating ?? "New"}
+                      {creator.rating ?? t("creators.rating.new")}
                     </span>
 
                     {(creator.review_count ?? 0) > 0 && (
@@ -229,7 +253,7 @@ const Creators = () => {
 
                   {creator.price_from && (
                     <span className="font-semibold text-primary">
-                      from ${creator.price_from}
+                      {t("creators.price")}{creator.price_from}
                     </span>
                   )}
                 </div>
@@ -240,7 +264,7 @@ const Creators = () => {
 
         {!loading && filtered.length === 0 && (
           <div className="text-center py-16 text-muted-foreground">
-            <p className="text-lg">No creators found.</p>
+            <p className="text-lg">{t("creators.nodata")}</p>
           </div>
         )}
       </div>

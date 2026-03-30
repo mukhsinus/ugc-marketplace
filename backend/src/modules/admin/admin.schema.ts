@@ -26,14 +26,9 @@ export const jobParamsSchema = z.object({
 
 export const updateCommissionSchema = z.object({
   value: z
-    .string()
-    .regex(/^\d+$/)
-    .refine((v) => {
-      const n = Number(v);
-      return n >= 0 && n <= 50;
-    }, {
-      message: "Commission must be between 0 and 50"
-    })
+    .number()
+    .min(0, "Commission must be at least 0%")
+    .max(50, "Commission cannot exceed 50%")
 });
 
 

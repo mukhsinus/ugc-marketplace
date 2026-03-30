@@ -42,6 +42,7 @@ export const adminService = {
 
     const profiles = data.profiles;
     const jobs = data.jobs;
+    const payouts = data.payouts;
 
     const creators = profiles.filter((p: any) => p.role === "creator").length;
     const brands = profiles.filter((p: any) => p.role === "brand").length;
@@ -69,6 +70,8 @@ export const adminService = {
           job.profiles?.name ||
           null
       })),
+
+      payouts,
 
       commission: data.commission
 

@@ -5,12 +5,13 @@ import {
   createProposalSchema,
   updateProposalSchema
 } from "./proposals.schema";
+import type { ProposalResponse, ProposalDetailResponse, ProposalsListResponse } from "../../types/responses";
 
 export async function getJobProposals(
   request: FastifyRequest<{ Params: { jobId: string } }>,
   reply: FastifyReply
-) {
-  const proposals = await proposalsService.getJobProposals(
+): Promise<void> {
+  const proposals: ProposalDetailResponse[] = await proposalsService.getJobProposals(
     request.params.jobId,
     request.user!.id
   );
@@ -21,14 +22,14 @@ export async function getJobProposals(
 export async function createProposal(
   request: FastifyRequest<{ Params: { jobId: string } }>,
   reply: FastifyReply
-) {
+): Promise<void> {
   const parsed = createProposalSchema.safeParse(request.body);
 
   if (!parsed.success) {
     return reply.status(400).send(parsed.error);
   }
 
-  const proposal = await proposalsService.createProposal(
+  const proposal: ProposalDetailResponse = await proposalsService.createProposal(
     request.user!.id,
     request.params.jobId,
     parsed.data
@@ -40,14 +41,14 @@ export async function createProposal(
 export async function updateProposal(
   request: FastifyRequest<{ Params: { id: string } }>,
   reply: FastifyReply
-) {
+): Promise<void> {
   const parsed = updateProposalSchema.safeParse(request.body);
 
   if (!parsed.success) {
     return reply.status(400).send(parsed.error);
   }
 
-  const proposal = await proposalsService.updateProposal(
+  const proposal: ProposalDetailResponse = await proposalsService.updateProposal(
     request.user!.id,
     request.params.id,
     parsed.data

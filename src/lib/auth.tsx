@@ -8,6 +8,7 @@ import {
 } from "react";
 
 import { api } from "@/lib/api";
+import type { UserResponse, ProfileResponse, LoginResponse } from "@/types/api-responses";
 
 const TOKEN_KEY = "ugc_token";
 
@@ -15,37 +16,11 @@ const TOKEN_KEY = "ugc_token";
 /* TYPES */
 /* ------------------------------------------------ */
 
-type User = {
-  id: string;
-  email: string;
-};
+type User = UserResponse;
+type Profile = ProfileResponse;
 
 type Session = {
   access_token: string;
-};
-
-type Profile = {
-  id: string;
-  name: string;
-  username: string | null;
-  email: string;
-  role: "admin" | "creator" | "brand";
-  city: string | null;
-  bio: string | null;
-  categories: string[];
-  price_from: number | null;
-  instagram_link: string | null;
-  tiktok_link: string | null;
-  youtube_link: string | null;
-  avatar_url: string | null;
-  rating: number;
-  review_count: number;
-  company_name: string | null;
-  contact_name: string | null;
-  website: string | null;
-  industry: string | null;
-  is_banned: boolean;
-  created_at: string;
 };
 
 type AuthContextType = {
