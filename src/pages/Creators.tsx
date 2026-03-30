@@ -1,5 +1,4 @@
 // src/pages/Creators.tsx
-
 import { useEffect, useState } from "react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -101,7 +100,6 @@ const Creators = () => {
         );
 
         const data = res?.data ?? res ?? [];
-
         setCreators(Array.isArray(data) ? data : []);
       } catch (err) {
         console.error("Creators load error:", err);
@@ -121,8 +119,11 @@ const Creators = () => {
     : creators;
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="flex flex-col min-h-screen bg-background">
+
       <Navbar />
+
+      <main className="flex-1">
 
       <div className="container mx-auto px-4 pt-24 pb-16">
         <h1 className="text-3xl md:text-4xl font-bold mb-2">
@@ -133,11 +134,13 @@ const Creators = () => {
           {t("creators.subtitle")}
         </p>
 
-        {/* Filters */}
+          {/* Filters */}
 
-        <div className="flex flex-col md:flex-row gap-3 mb-8">
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          <div className="flex flex-col md:flex-row gap-3 mb-8">
+
+            <div className="relative flex-1">
+
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
 
             <Input
               placeholder={t("creators.search")}
@@ -147,10 +150,10 @@ const Creators = () => {
             />
           </div>
 
-          <Select value={category} onValueChange={setCategory}>
-            <SelectTrigger className="w-full md:w-40 rounded-full">
-              <SelectValue />
-            </SelectTrigger>
+            <Select value={category} onValueChange={setCategory}>
+              <SelectTrigger className="w-full md:w-40 rounded-full">
+                <SelectValue />
+              </SelectTrigger>
 
             <SelectContent className="rounded-3xl">
               {categories.map((cat, idx) => (
@@ -161,10 +164,10 @@ const Creators = () => {
             </SelectContent>
           </Select>
 
-          <Select value={city} onValueChange={setCity}>
-            <SelectTrigger className="w-full md:w-40 rounded-full">
-              <SelectValue />
-            </SelectTrigger>
+            <Select value={city} onValueChange={setCity}>
+              <SelectTrigger className="w-full md:w-40 rounded-full">
+                <SelectValue />
+              </SelectTrigger>
 
             <SelectContent className="rounded-3xl">
               {cities.map((c, idx) => (
@@ -175,10 +178,10 @@ const Creators = () => {
             </SelectContent>
           </Select>
 
-          <Select value={sort} onValueChange={setSort}>
-            <SelectTrigger className="w-full md:w-40 rounded-full">
-              <SelectValue />
-            </SelectTrigger>
+            <Select value={sort} onValueChange={setSort}>
+              <SelectTrigger className="w-full md:w-40 rounded-full">
+                <SelectValue />
+              </SelectTrigger>
 
             <SelectContent className="rounded-3xl">
               <SelectItem value="rating" className="rounded-full">{t("creators.sort.toprated")}</SelectItem>
@@ -207,49 +210,53 @@ const Creators = () => {
                     {creator.name?.charAt(0) || "?"}
                   </div>
 
-                  <div>
-                    <h3 className="font-semibold">{creator.name}</h3>
+                    <div>
 
-                    {creator.city && (
-                      <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                        <MapPin className="w-3 h-3" />
-                        {creator.city}
-                      </div>
-                    )}
+                      <h3 className="font-semibold">{creator.name}</h3>
+
+                      {creator.city && (
+                        <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                          <MapPin className="w-3 h-3" />
+                          {creator.city}
+                        </div>
+                      )}
+
+                    </div>
+
                   </div>
-                </div>
 
                 <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
                   {creator.bio || t("creators.default")}
                 </p>
 
-                <div className="flex flex-wrap gap-1.5 mb-3">
-                  {(creator.categories || []).slice(0, 3).map((cat) => (
-                    <span
-                      key={cat}
-                      className={`px-2 py-0.5 rounded-full text-xs font-medium capitalize ${
-                        categoryColors[cat] || "bg-muted text-muted-foreground"
-                      }`}
-                    >
-                      {cat}
-                    </span>
-                  ))}
-                </div>
+                  <div className="flex flex-wrap gap-1.5 mb-3">
 
-                <div className="flex items-center justify-between text-sm">
-                  <div className="flex items-center gap-1">
-                    <Star className="w-3.5 h-3.5 fill-yellow-400 text-yellow-400" />
+                    {(creator.categories || []).slice(0, 3).map((cat) => (
+
+                      <span
+                        key={cat}
+                        className={`px-2 py-0.5 rounded-full text-xs font-medium capitalize ${
+                          categoryColors[cat] || "bg-muted text-muted-foreground"
+                        }`}
+                      >
+                        {cat}
+                      </span>
+
+                    ))}
+
+                  </div>
+
+                  <div className="flex items-center justify-between text-sm">
+
+                    <div className="flex items-center gap-1">
+
+                      <Star className="w-3.5 h-3.5 fill-yellow-400 text-yellow-400" />
 
                     <span className="font-medium">
                       {creator.rating ?? t("creators.rating.new")}
                     </span>
 
-                    {(creator.review_count ?? 0) > 0 && (
-                      <span className="text-muted-foreground">
-                        ({creator.review_count})
-                      </span>
-                    )}
-                  </div>
+                    </div>
 
                   {creator.price_from && (
                     <span className="font-semibold text-primary">
@@ -257,10 +264,14 @@ const Creators = () => {
                     </span>
                   )}
                 </div>
+
               </div>
+
             ))}
-          </div>
-        )}
+
+            </div>
+
+          )}
 
         {!loading && filtered.length === 0 && (
           <div className="text-center py-16 text-muted-foreground">
@@ -269,7 +280,10 @@ const Creators = () => {
         )}
       </div>
 
+      </main>
+
       <Footer />
+
     </div>
   );
 };
